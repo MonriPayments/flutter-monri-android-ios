@@ -1,0 +1,38 @@
+PODS:
+  - Alamofire (4.9.1)
+  - Caishen (2.2.1)
+  - Flutter (1.0.0)
+  - Monri (1.1.2):
+    - Alamofire (~> 4.0)
+    - Caishen
+  - MonriPayments (0.0.1):
+    - Flutter
+    - Monri (= 1.1.2)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - Monri (= 1.1.2)
+  - MonriPayments (from `.symlinks/plugins/MonriPayments/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - Caishen
+    - Monri
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  MonriPayments:
+    :path: ".symlinks/plugins/MonriPayments/ios"
+
+SPEC CHECKSUMS:
+  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
+  Caishen: 903d1d567b010b28217acd38e438b5917623cfef
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  Monri: 18e548739b4efed4dc75373d4dde3487e8559dce
+  MonriPayments: ae8c8f43968df5c339940be9637d378a10114454
+
+PODFILE CHECKSUM: 3401d66c9e3eb5858ba181d2cdeafb7d2e0b86ad
+
+COCOAPODS: 1.8.4
