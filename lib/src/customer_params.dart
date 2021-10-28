@@ -4,24 +4,31 @@ part 'customer_params.g.dart';
 @JsonSerializable()
 class CustomerParams{
   @JsonKey(name : "email")
-  String email;
+  String? email;
   @JsonKey(name : "ch_full_name")
-  String fullName;
+  String? fullName;
   @JsonKey(name : "ch_address")
-  String address;
+  String? address;
   @JsonKey(name : "ch_city")
-  String city;
+  String? city;
   @JsonKey(name : "ch_zip")
-  String zip;
+  String? zip;
   @JsonKey(name : "ch_phone")
-  String phone;
+  String? phone;
   @JsonKey(name : "ch_country")
-  String country;
+  String? country;
 
-  CustomerParams();
+  CustomerParams({
+       this.email,
+       this.fullName,
+       this.address,
+       this.city,
+       this.zip,
+       this.phone,
+       this.country
+      });
 
-
-  CustomerParams.init(this.email, this.fullName, this.address, this.city, this.zip, this.phone, this.country);
+  // CustomerParams.init(this.email, this.fullName, this.address, this.city, this.zip, this.phone, this.country);
 
   factory CustomerParams.fromJson(Map<String, dynamic> json) => _$CustomerParamsFromJson(json);
 

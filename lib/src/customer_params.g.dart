@@ -6,16 +6,16 @@ part of 'customer_params.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-CustomerParams _$CustomerParamsFromJson(Map<String, dynamic> json) {
-  return CustomerParams()
-    ..email = json['email'] as String
-    ..fullName = json['ch_full_name'] as String
-    ..address = json['ch_address'] as String
-    ..city = json['ch_city'] as String
-    ..zip = json['ch_zip'] as String
-    ..phone = json['ch_phone'] as String
-    ..country = json['ch_country'] as String;
-}
+CustomerParams _$CustomerParamsFromJson(Map<String, dynamic> json) =>
+    CustomerParams(
+      email: json['email'] as String?,
+      fullName: json['ch_full_name'] as String?,
+      address: json['ch_address'] as String?,
+      city: json['ch_city'] as String?,
+      zip: json['ch_zip'] as String?,
+      phone: json['ch_phone'] as String?,
+      country: json['ch_country'] as String?,
+    );
 
 Map<String, dynamic> _$CustomerParamsToJson(CustomerParams instance) =>
     <String, dynamic>{

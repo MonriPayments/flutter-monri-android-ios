@@ -8,6 +8,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="MonriPayments_example"
+        android:theme="@style/Theme.AppCompat.Light"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

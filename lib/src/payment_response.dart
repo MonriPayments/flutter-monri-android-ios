@@ -13,11 +13,18 @@ class PaymentResponse{
 
     PaymentResponseStatus status;
 
-    switch(statusString){
-      case "approved" : status = PaymentResponseStatus.approved;break;
-      case "declined" : status = PaymentResponseStatus.declined;break;
-      case "error" : status = PaymentResponseStatus.error;break;
-      default: status = PaymentResponseStatus.unknown;
+    switch (statusString) {
+      case "approved" :
+        status = PaymentResponseStatus.approved;
+        break;
+      case "declined" :
+        status = PaymentResponseStatus.declined;
+        break;
+      case "error" :
+        status = PaymentResponseStatus.error;
+        break;
+      default:
+        status = PaymentResponseStatus.unknown;
     }
 
     return PaymentResponse(status);

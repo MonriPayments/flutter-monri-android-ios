@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:MonriPayments/MonriPayments.dart';
 import 'package:MonriPayments/src/payment_response.dart';
 import 'package:MonriPayments/src/test/monri_payments_test.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
 
 class CardConfirmPaymentParams {
   final String authenticityToken;
@@ -14,16 +12,20 @@ class CardConfirmPaymentParams {
   final String cvv;
   final int expiryYear;
   final int expiryMonth;
-  final TransactionParams transactionParams;
+  final TransactionParams? transactionParams;
   final bool isDebug;
   final bool tokenizePan;
 
   CardConfirmPaymentParams({
-    @required this.authenticityToken, @required this.clientSecret,
-    @required this.cardNumber, @required this.cvv,
-    @required this.expiryYear,
-    @required this.expiryMonth,
-    @required this.transactionParams, @required this.isDebug, @required this.tokenizePan,
+    required this.authenticityToken,
+    required this.clientSecret,
+    required this.cardNumber,
+    required this.cvv,
+    required this.expiryYear,
+    required this.expiryMonth,
+    required this.transactionParams,
+    required this.isDebug,
+    required this.tokenizePan,
   });
 
   Map<String, dynamic> toJSON() {
@@ -41,6 +43,31 @@ class CardConfirmPaymentParams {
       "transaction_params": transactionParams?.toJson() ?? {}
     };
   }
+
+  static CardConfirmPaymentParams fromJSON(Map<String, dynamic> json) {
+    // todo do we need this method
+    //todo some validation?
+    if (!json.containsKey("authenticity_token")){
+      throw "CardConfirmPaymentParams::fromJson method doesn't have a key: ${1}";
+    }
+
+    TransactionParams trxParams = TransactionParams.create();
+    Map<String, String> tmpData = Map<String, String>.from(json["transaction"]);
+    trxParams.data = tmpData;
+
+    return CardConfirmPaymentParams(
+        authenticityToken: json["authenticity_token"],
+        clientSecret: json["client_secret"],
+        cardNumber: json["card"]["pan"],
+        cvv: json["card"]["cvv"],
+        expiryYear: (int.parse(json["card"]["expiration_date"]).round()/ 100).round(),
+        expiryMonth: (int.parse(json["card"]["expiration_date"]).round() % 100).round(),
+        transactionParams: trxParams,
+        isDebug: json["is_development_mode"],
+        tokenizePan: json["tokenize_pan"] ?? false
+    );
+  }
+
 }
 
 class SavedCardConfirmPaymentParams {
@@ -52,9 +79,13 @@ class SavedCardConfirmPaymentParams {
   final bool isDebug;
 
 
-  SavedCardConfirmPaymentParams(
-      {@required this.authenticityToken, @required this.clientSecret,
-        @required this.panToken, @required this.cvv, @required this.transactionParams, @required this.isDebug});
+  SavedCardConfirmPaymentParams({
+    required this.authenticityToken,
+    required this.clientSecret,
+    required this.panToken,
+    required this.cvv,
+    required this.transactionParams,
+    required this.isDebug});
 
   Map<String, dynamic> toJSON() {
     return {
@@ -81,8 +112,7 @@ class _MonriPaymentsImpl extends MonriPayments {
 
   Future<PaymentResponse> savedCardPayment(
       SavedCardConfirmPaymentParams arguments) async {
-    Map result =
-    await _channel.invokeMethod('confirmPayment', arguments.toJSON());
+    Map result = await _channel.invokeMethod('confirmPayment', arguments.toJSON());
     print(result);
     return PaymentResponse.fromJson(result);
   }

@@ -6,13 +6,11 @@ part of 'payment_method_params.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-PaymentMethodParams _$PaymentMethodParamsFromJson(Map<String, dynamic> json) {
-  return PaymentMethodParams()
-    ..type = json['type'] as String
-    ..data = (json['data'] as Map<String, dynamic>)?.map(
-      (k, e) => MapEntry(k, e as String),
+PaymentMethodParams _$PaymentMethodParamsFromJson(Map<String, dynamic> json) =>
+    PaymentMethodParams(
+      json['type'] as String,
+      Map<String, String>.from(json['data'] as Map),
     );
-}
 
 Map<String, dynamic> _$PaymentMethodParamsToJson(
         PaymentMethodParams instance) =>

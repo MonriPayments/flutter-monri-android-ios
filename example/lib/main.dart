@@ -18,11 +18,12 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Map _data = {};
   final monriPayments = MonriPayments.create();
+  static const platform = MethodChannel('monri.create.payment.session.channel');
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    // initPlatformState();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -30,8 +31,9 @@ class _MyAppState extends State<MyApp> {
     Map data;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      var arguments = jsonDecode(_jsonData);
-      data = (await monriPayments.confirmPayment(arguments)).toJson();
+      var clientSecreet = await platform.invokeMethod('monri.create.payment.session.method');
+      var arguments = jsonDecode(_getJsonData(clientSecreet));
+      data = (await monriPayments.confirmPayment(CardConfirmPaymentParams.fromJSON(arguments))).toJson();
       print(data);
     } on PlatformException {
       data = {};
@@ -52,10 +54,27 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Monri Plugin example app'),
         ),
         body: Center(
-          child: Text(_data.toString()),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              children: [
+                Text(_data.toString()),
+                Material(
+                  child: InkWell(
+                      onTap: (){initPlatformState();},
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                          child: Text('Start Payment')
+                      )
+                  ),
+                  color: Colors.blue,
+                )
+              ],
+            ),
+          )
         ),
       ),
     );
@@ -67,6 +86,31 @@ class _MyAppState extends State<MyApp> {
 String _a = "{\"email\":\"s.nazdrajic@gmail.com\",\"user_id\":\"460\",\"name\":\"| cardHolderName |\",\"phone_number\":\"0603207111\",\"platform\":\"flutter macos\"}"
 ;
 
+ String _getJsonData(String clientSecret){
+    return """
+{
+  "is_development_mode": true,
+  "authenticity_token": "a6d41095984fc60fe81cd3d65ecafe56d4060ca9",
+  "client_secret": "$clientSecret",
+  "card": {
+    "pan": "4111111111111111",
+    "expiration_date": "2210",
+    "cvv": "111",
+    "tokenize_pan": "false"
+  },
+  "transaction": {
+      "ch_full_name": "| cardHolderName |",
+      "ch_address": "N/A",
+      "ch_city": "Sarajevo",
+      "ch_zip": "71000",
+      "ch_phone": "N/A",
+      "ch_country": "BA",
+      "ch_email": "s.nazdrajic@gmail.com",
+      "custom_params": ""
+  }
+}
+""";
+ }
 String _jsonData = """
 {
   "is_development_mode": true,
@@ -74,7 +118,7 @@ String _jsonData = """
   "client_secret": "96fa0afa32884b81d323341160365356f4a994d1",
   "card": {
     "pan": "4111111111111111",
-    "expiration_date": "2010",
+    "expiration_date": "2210",
     "cvv": "111",
     "tokenize_pan": "false"
   },

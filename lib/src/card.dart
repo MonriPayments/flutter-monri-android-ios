@@ -8,7 +8,6 @@ class Card extends PaymentMethod{
   int expYear;
   bool tokenizePan;
 
-
   Card(this.number, this.cvc, this.expMonth, this.expYear, this.tokenizePan);
 
   @override

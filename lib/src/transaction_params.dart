@@ -5,7 +5,7 @@ class TransactionParams {
 
   static TransactionParams create() => TransactionParams();
 
-  TransactionParams set(String key, String value) {
+  TransactionParams set(String key, String? value) {
     if (value == null) {
       data.remove(key);
     } else {

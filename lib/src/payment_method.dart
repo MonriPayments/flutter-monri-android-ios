@@ -9,5 +9,5 @@ abstract class PaymentMethod {
 
   Map<String, String> data();
 
-  PaymentMethodParams toPaymentMethodParams() => PaymentMethodParams.init(paymentMethodType(), data());
+  PaymentMethodParams toPaymentMethodParams() => PaymentMethodParams(paymentMethodType(), data());
 }

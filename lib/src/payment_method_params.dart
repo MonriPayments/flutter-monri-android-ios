@@ -6,10 +6,7 @@ class PaymentMethodParams{
   String type;
   Map<String, String> data;
 
-  PaymentMethodParams();
-
-
-  PaymentMethodParams.init(this.type, this.data);
+  PaymentMethodParams(this.type, this.data);
 
   factory PaymentMethodParams.fromJson(Map<String, dynamic> json) => _$PaymentMethodParamsFromJson(json);
 
