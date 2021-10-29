@@ -52,7 +52,7 @@ class CardConfirmPaymentParams {
     }
 
     TransactionParams trxParams = TransactionParams.create();
-    Map<String, String> tmpData = Map<String, String>.from(json["transaction"]);
+    Map<String, String> tmpData = Map<String, String>.from(json["transaction_params"]);
     trxParams.data = tmpData;
 
     return CardConfirmPaymentParams(
@@ -60,8 +60,8 @@ class CardConfirmPaymentParams {
         clientSecret: json["client_secret"],
         cardNumber: json["card"]["pan"],
         cvv: json["card"]["cvv"],
-        expiryYear: (int.parse(json["card"]["expiration_date"]).round()/ 100).round(),
-        expiryMonth: (int.parse(json["card"]["expiration_date"]).round() % 100).round(),
+        expiryYear: int.parse(json["card"]["expiryYear"]),
+        expiryMonth: int.parse(json["card"]["expiryMonth"]),
         transactionParams: trxParams,
         isDebug: json["is_development_mode"],
         tokenizePan: json["tokenize_pan"] ?? false

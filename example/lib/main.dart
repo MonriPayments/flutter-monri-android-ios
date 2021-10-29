@@ -94,11 +94,12 @@ String _a = "{\"email\":\"s.nazdrajic@gmail.com\",\"user_id\":\"460\",\"name\":\
   "client_secret": "$clientSecret",
   "card": {
     "pan": "4111111111111111",
-    "expiration_date": "2210",
     "cvv": "111",
+    "expiryMonth": "10",
+    "expiryYear": "2022",
     "tokenize_pan": "false"
   },
-  "transaction": {
+  "transaction_params": {
       "ch_full_name": "| cardHolderName |",
       "ch_address": "N/A",
       "ch_city": "Sarajevo",

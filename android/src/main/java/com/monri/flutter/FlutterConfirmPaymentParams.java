@@ -87,15 +87,15 @@ public class FlutterConfirmPaymentParams {
         Map<String, Object> transactionParamsJSON = (Map<String, Object>) request.get("transaction_params");
 
         FlutterTransactionParams transactionParams = new FlutterTransactionParams(
-                (String) transactionParamsJSON.get("order_info"),
-                (String) transactionParamsJSON.get("email"),
-                (String) transactionParamsJSON.get("full_name"),
-                (String) transactionParamsJSON.get("address"),
-                (String) transactionParamsJSON.get("city"),
-                (String) transactionParamsJSON.get("zip"),
-                (String) transactionParamsJSON.get("country"),
+                (String) transactionParamsJSON.get("ch_order_info"),
+                (String) transactionParamsJSON.get("ch_email"),
+                (String) transactionParamsJSON.get("ch_full_name"),
+                (String) transactionParamsJSON.get("ch_address"),
+                (String) transactionParamsJSON.get("ch_city"),
+                (String) transactionParamsJSON.get("ch_zip"),
+                (String) transactionParamsJSON.get("ch_country"),
                 (String) transactionParamsJSON.get("custom_params"),
-                (String) transactionParamsJSON.get("phone")
+                (String) transactionParamsJSON.get("ch_phone")
         );
 
         return new FlutterConfirmPaymentParams(developmentMode, authenticityToken, clientSecret, card, savedCard, transactionParams);
