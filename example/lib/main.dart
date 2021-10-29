@@ -100,13 +100,13 @@ String _a = "{\"email\":\"s.nazdrajic@gmail.com\",\"user_id\":\"460\",\"name\":\
     "tokenize_pan": "false"
   },
   "transaction_params": {
-      "ch_full_name": "| cardHolderName |",
-      "ch_address": "N/A",
-      "ch_city": "Sarajevo",
-      "ch_zip": "71000",
-      "ch_phone": "N/A",
-      "ch_country": "BA",
-      "ch_email": "s.nazdrajic@gmail.com",
+      "full_name": "| cardHolderName |",
+      "address": "N/A",
+      "city": "Sarajevo",
+      "zip": "71000",
+      "phone": "N/A",
+      "country": "BA",
+      "email": "s.nazdrajic@gmail.com",
       "custom_params": ""
   }
 }
@@ -125,13 +125,13 @@ String _jsonData = """
   },
   "transaction": {
     "data": {
-      "ch_full_name": "| cardHolderName |",
-      "ch_address": "N/A",
-      "ch_city": "Sarajevo",
-      "ch_zip": "71000",
-      "ch_phone": "N/A",
-      "ch_country": "BA",
-      "ch_email": "s.nazdrajic@gmail.com",
+      "full_name": "| cardHolderName |",
+      "address": "N/A",
+      "city": "Sarajevo",
+      "zip": "71000",
+      "phone": "N/A",
+      "country": "BA",
+      "email": "s.nazdrajic@gmail.com",
       "custom_params": ""
     }
   }

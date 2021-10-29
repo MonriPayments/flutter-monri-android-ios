@@ -16,13 +16,13 @@ class TransactionParams {
 
   TransactionParams setFromCustomerParams(CustomerParams customerParams) => customerParams == null
       ? this
-      : set("ch_full_name", customerParams.fullName)
-          .set("ch_address", customerParams.address)
-          .set("ch_city", customerParams.city)
-          .set("ch_zip", customerParams.zip)
-          .set("ch_phone", customerParams.phone)
-          .set("ch_country", customerParams.country)
-          .set("ch_email", customerParams.email);
+      : set("full_name", customerParams.fullName)
+          .set("address", customerParams.address)
+          .set("city", customerParams.city)
+          .set("zip", customerParams.zip)
+          .set("phone", customerParams.phone)
+          .set("country", customerParams.country)
+          .set("email", customerParams.email);
 
   Map<String, dynamic> toJson() => data;
 }

@@ -9,21 +9,21 @@ part of 'customer_params.dart';
 CustomerParams _$CustomerParamsFromJson(Map<String, dynamic> json) =>
     CustomerParams(
       email: json['email'] as String?,
-      fullName: json['ch_full_name'] as String?,
-      address: json['ch_address'] as String?,
-      city: json['ch_city'] as String?,
-      zip: json['ch_zip'] as String?,
-      phone: json['ch_phone'] as String?,
-      country: json['ch_country'] as String?,
+      fullName: json['full_name'] as String?,
+      address: json['address'] as String?,
+      city: json['city'] as String?,
+      zip: json['zip'] as String?,
+      phone: json['phone'] as String?,
+      country: json['country'] as String?,
     );
 
 Map<String, dynamic> _$CustomerParamsToJson(CustomerParams instance) =>
     <String, dynamic>{
       'email': instance.email,
-      'ch_full_name': instance.fullName,
-      'ch_address': instance.address,
-      'ch_city': instance.city,
-      'ch_zip': instance.zip,
-      'ch_phone': instance.phone,
-      'ch_country': instance.country,
+      'full_name': instance.fullName,
+      'address': instance.address,
+      'city': instance.city,
+      'zip': instance.zip,
+      'phone': instance.phone,
+      'country': instance.country,
     };

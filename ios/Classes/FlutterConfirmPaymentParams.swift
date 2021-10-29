@@ -88,14 +88,14 @@ class FlutterConfirmPaymentParams {
         let transactionParamsJSON: Dictionary<String, AnyObject?> = request["transaction_params"] as! Dictionary<String, AnyObject?>
         
         let transactionParams: FlutterTransactionParams  = FlutterTransactionParams(
-            orderInfo: transactionParamsJSON["ch_order_info"] as? String,
-            email: transactionParamsJSON["ch_email"] as? String,
-            fullName: transactionParamsJSON["ch_full_name"] as? String,
-            address: transactionParamsJSON["ch_address"] as? String,
-            city: transactionParamsJSON["ch_city"] as? String,
-            zip: transactionParamsJSON["ch_zip"] as? String,
-            phone: transactionParamsJSON["ch_phone"] as? String,
-            country: transactionParamsJSON["ch_country"] as? String,
+            orderInfo: transactionParamsJSON["order_info"] as? String,
+            email: transactionParamsJSON["email"] as? String,
+            fullName: transactionParamsJSON["full_name"] as? String,
+            address: transactionParamsJSON["address"] as? String,
+            city: transactionParamsJSON["city"] as? String,
+            zip: transactionParamsJSON["zip"] as? String,
+            phone: transactionParamsJSON["phone"] as? String,
+            country: transactionParamsJSON["country"] as? String,
             customParams:transactionParamsJSON["custom_params"] as? String
         )
         

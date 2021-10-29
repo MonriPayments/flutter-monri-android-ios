@@ -5,17 +5,17 @@ part 'customer_params.g.dart';
 class CustomerParams{
   @JsonKey(name : "email")
   String? email;
-  @JsonKey(name : "ch_full_name")
+  @JsonKey(name : "full_name")
   String? fullName;
-  @JsonKey(name : "ch_address")
+  @JsonKey(name : "address")
   String? address;
-  @JsonKey(name : "ch_city")
+  @JsonKey(name : "city")
   String? city;
-  @JsonKey(name : "ch_zip")
+  @JsonKey(name : "zip")
   String? zip;
-  @JsonKey(name : "ch_phone")
+  @JsonKey(name : "phone")
   String? phone;
-  @JsonKey(name : "ch_country")
+  @JsonKey(name : "country")
   String? country;
 
   CustomerParams({
