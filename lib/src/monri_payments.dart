@@ -96,7 +96,7 @@ class SavedCardConfirmPaymentParams {
       },
       "client_secret": clientSecret,
       "is_development_mode": isDebug,
-      "transaction_params": transactionParams?.toJson() ?? {}
+      "transaction_params": transactionParams.toJson()
     };
   }
 }
@@ -113,7 +113,7 @@ class _MonriPaymentsImpl extends MonriPayments {
   Future<PaymentResponse> savedCardPayment(
       SavedCardConfirmPaymentParams arguments) async {
     Map result = await _channel.invokeMethod('confirmPayment', arguments.toJSON());
-    print(result);
+    // print(result);
     return PaymentResponse.fromJson(result);
   }
 //confirmPayment

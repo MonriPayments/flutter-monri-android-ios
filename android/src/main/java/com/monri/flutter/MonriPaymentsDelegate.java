@@ -33,7 +33,7 @@ public class MonriPaymentsDelegate implements PluginRegistry.ActivityResultListe
 
     @Override
     public void onSuccess(PaymentResult result) {
-        System.out.println(result.toString());
+//        System.out.println(result.toString());
 
         if (confirmPaymentResult != null) {
             Map<String, Object> response = new HashMap<>();

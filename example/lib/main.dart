@@ -94,7 +94,7 @@ class _MyAppState extends State<MyApp> {
           cardHolderName: _cardHolderName!
       ));
       data = (await monriPayments.confirmPayment(CardConfirmPaymentParams.fromJSON(arguments))).toJson();
-      print(data);
+      // print(data);
     } on PlatformException {
       data = {};
     }
@@ -169,8 +169,6 @@ class _MyAppState extends State<MyApp> {
                         labelText: 'Card Number',
                       ),
                       onSaved: (String? value) {
-                        print('onSaved = $value');
-                        print('Num controller has = ${numberController.text}');
                         _cardNumber = CardUtils.getCleanedNumber(value!);
                       },
                       validator: CardUtils.validateCardNum,

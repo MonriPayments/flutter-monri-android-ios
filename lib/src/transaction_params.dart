@@ -14,9 +14,8 @@ class TransactionParams {
     return this;
   }
 
-  TransactionParams setFromCustomerParams(CustomerParams customerParams) => customerParams == null
-      ? this
-      : set("full_name", customerParams.fullName)
+  TransactionParams setFromCustomerParams(CustomerParams customerParams) =>
+           set("full_name", customerParams.full_name)
           .set("address", customerParams.address)
           .set("city", customerParams.city)
           .set("zip", customerParams.zip)

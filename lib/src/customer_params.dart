@@ -1,26 +1,16 @@
-import 'package:json_annotation/json_annotation.dart';
-part 'customer_params.g.dart';
 
-@JsonSerializable()
 class CustomerParams{
-  @JsonKey(name : "email")
   String? email;
-  @JsonKey(name : "full_name")
-  String? fullName;
-  @JsonKey(name : "address")
+  String? full_name;
   String? address;
-  @JsonKey(name : "city")
   String? city;
-  @JsonKey(name : "zip")
   String? zip;
-  @JsonKey(name : "phone")
   String? phone;
-  @JsonKey(name : "country")
   String? country;
 
   CustomerParams({
        this.email,
-       this.fullName,
+       this.full_name,
        this.address,
        this.city,
        this.zip,
@@ -28,9 +18,28 @@ class CustomerParams{
        this.country
       });
 
-  // CustomerParams.init(this.email, this.fullName, this.address, this.city, this.zip, this.phone, this.country);
 
-  factory CustomerParams.fromJson(Map<String, dynamic> json) => _$CustomerParamsFromJson(json);
+  factory CustomerParams.fromJson(Map<String, dynamic> json) {
+    return CustomerParams(
+      email: json['email'] as String,
+      full_name: json['full_name'] as String,
+      address: json['address'] as String,
+      city: json['city'] as String,
+      zip: json['zip'] as String,
+      phone: json['phone'] as String,
+      country: json['country'] as String
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$CustomerParamsToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'email': email,
+      'full_name': full_name,
+      'address': address,
+      'city': city,
+      'zip': zip,
+      'phone': phone,
+      'country': country
+    };
+  }
 }
