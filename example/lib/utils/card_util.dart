@@ -1,4 +1,4 @@
-import 'package:MonriPayments_example/string_messages.dart';
+import 'package:MonriPayments_example/utils/string_messages.dart';
 import 'package:flutter/material.dart';
 
 enum CardType {

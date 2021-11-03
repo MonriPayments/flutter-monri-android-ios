@@ -64,7 +64,7 @@ class CardConfirmPaymentParams {
         expiryMonth: int.parse(json["card"]["expiryMonth"]),
         transactionParams: trxParams,
         isDebug: json["is_development_mode"],
-        tokenizePan: json["tokenize_pan"] ?? false
+        tokenizePan: json["card"]["tokenize_pan"] ?? false
     );
   }
 

@@ -5,18 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fcc30567-14c6-4d24-9d7a-d59034394b24" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/MonriPayments.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MonriPayments.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/monri/flutter/MonriPaymentsDelegate.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/monri/flutter/MonriPaymentsDelegate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/lib/card_util.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/utils/card_util.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/lib/input_formatters.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/utils/input_formatters.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/example/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/customer_params.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/customer_params.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/customer_params.g.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/lib/string_messages.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/utils/string_messages.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/src/monri_payments.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/monri_payments.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/payment_method_params.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/payment_method_params.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/payment_method_params.g.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/transaction_params.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/transaction_params.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,6 +66,14 @@
       <option name="presentableId" value="Default" />
       <updated>1605230520585</updated>
     </task>
+    <task id="LOCAL-00001" summary="WP-801 Removed json dependencies&#10;&#10;&#10;Removed json dependencies.&#10;&#10;WP-801">
+      <created>1635778728429</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1635778728429</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -84,6 +87,10 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="WP-801 Removed json dependencies&#10;&#10;&#10;Removed json dependencies.&#10;&#10;WP-801" />
+    <option name="LAST_COMMIT_MESSAGE" value="WP-801 Removed json dependencies&#10;&#10;&#10;Removed json dependencies.&#10;&#10;WP-801" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
