@@ -117,7 +117,13 @@ public class FlutterConfirmPaymentParams {
         String customParams;
 
         FlutterTransactionParams(String orderInfo,
-                                 String email, String fullName, String address, String city, String zip, String country, String customParams,
+                                 String email,
+                                 String fullName,
+                                 String address,
+                                 String city,
+                                 String zip,
+                                 String country,
+                                 String customParams,
                                  String phone) {
             this.orderInfo = orderInfo;
             this.email = email;

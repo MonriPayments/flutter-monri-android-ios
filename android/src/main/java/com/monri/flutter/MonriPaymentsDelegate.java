@@ -1,9 +1,6 @@
 package com.monri.flutter;
 
 import android.content.Intent;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.monri.android.Monri;
 import com.monri.android.ResultCallback;
 import com.monri.android.model.PaymentResult;
@@ -43,6 +40,7 @@ public class MonriPaymentsDelegate implements PluginRegistry.ActivityResultListe
             data.put("amount", result.getAmount());
             data.put("order_number", result.getOrderNumber());
             data.put("transaction_type", result.getTransactionType());
+            data.put("pan_token", result.getPanToken());
             List<String> errors = result.getErrors();
             if (errors != null) {
                 data.put("errors", errors);

@@ -141,14 +141,14 @@ class CardUtils {
         icon = new Icon(
           Icons.credit_card,
           size: 40.0,
-          color: Colors.grey[600],
+          color: Colors.grey,
         );
         break;
       default:
         icon = new Icon(
           Icons.warning,
           size: 40.0,
-          color: Colors.grey[600],
+          color: Colors.grey,
         );
         break;
     }

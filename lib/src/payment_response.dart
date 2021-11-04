@@ -1,8 +1,9 @@
 class PaymentResponse{
   final PaymentResponseStatus status;
+  final Map<String, dynamic> data;
 
 
-  PaymentResponse(this.status);
+  PaymentResponse(this.status, this.data);
 
   factory PaymentResponse.fromJson(Map json){
     print(json);
@@ -12,6 +13,7 @@ class PaymentResponse{
     }
 
     PaymentResponseStatus status;
+    Map<String, dynamic> data = Map<String, dynamic>.from(json["data"]);
 
     switch (statusString) {
       case "approved" :
@@ -27,12 +29,13 @@ class PaymentResponse{
         status = PaymentResponseStatus.unknown;
     }
 
-    return PaymentResponse(status);
+    return PaymentResponse(status, data);
 
   }
 
   Map<String, dynamic> toJson() => {
     "status" : status.toString(),
+    "data": data
   };
 
   @override

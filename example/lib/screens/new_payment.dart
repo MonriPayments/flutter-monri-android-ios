@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:MonriPayments/MonriPayments.dart';
 import 'package:MonriPayments_example/models/object_argument.dart';
+import 'package:MonriPayments_example/widgets/monri_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../utils/card_util.dart';
@@ -14,7 +15,7 @@ class NewPayment extends StatefulWidget {
   NewPayment({Key? key, required this.objectArgument});
 
   @override
-  State<NewPayment> createState() => _NewPaymentState();
+  State<NewPayment> createState() => _NewPaymentState(objectArgument.threeDS);
 }
 
 class _NewPaymentState extends State<NewPayment> {
@@ -24,7 +25,12 @@ class _NewPaymentState extends State<NewPayment> {
   final _cvvFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
   var _autoValidateMode = AutovalidateMode.disabled;
-  var numberController = new TextEditingController();
+  var numberController;
+
+
+  _NewPaymentState(bool is3DS){
+    numberController = new TextEditingController(text: is3DS ? threeDsPredefinedData["card_number"] : "");
+  }
 
   var _cardType = CardType.Others;
   String? _cardHolderName;
@@ -32,8 +38,6 @@ class _NewPaymentState extends State<NewPayment> {
   int? _expirationMonth;
   int? _expirationYear;
   int? _cvv;
-
-  // String _result = "";
 
   final monriPayments = MonriPayments.create();
   static const platform = MethodChannel('monri.create.payment.session.channel');
@@ -75,18 +79,18 @@ class _NewPaymentState extends State<NewPayment> {
       form.save();
       // Encrypt and send send payment details to payment gateway
       // _showInSnackBar('Payment card is valid, continue to pay...');
-      initPlatformState();
+      continuePayment();
     }
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
+  Future<void> continuePayment() async {
     Map data = {};
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      var clientSecreet = await platform.invokeMethod('monri.create.payment.session.method');
+      var clientSecret = await platform.invokeMethod('monri.create.payment.session.method');
       var arguments = jsonDecode(_getJsonData(
-          clientSecret: clientSecreet,
+          clientSecret: clientSecret,
           cardNumber: _cardNumber!,
           cvv: _cvv!,
           expirationMonth: _expirationMonth!,
@@ -129,15 +133,24 @@ class _NewPaymentState extends State<NewPayment> {
                           height: 20.0,
                         ),
                         new TextFormField(
-                          decoration: const InputDecoration(
-                            border: const UnderlineInputBorder(),
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide:  BorderSide(color: Colors.transparent),
+                            ),
                             filled: true,
                             icon: const Icon(
                               Icons.person,
                               size: 40.0,
+                              color: Colors.grey,
                             ),
                             labelText: 'Card Holder Name',
                           ),
+                          style: TextStyle(
+                            color: widget.objectArgument.threeDS ? Colors.black45 : Colors.blue
+                          ),
+                          initialValue: widget.objectArgument.threeDS? threeDsPredefinedData["card_holder_name"] : "",
+                          enabled: widget.objectArgument.threeDS? false : true,
                           onSaved: (String? value) {
                             _cardHolderName = value;
                           },
@@ -164,11 +177,18 @@ class _NewPaymentState extends State<NewPayment> {
                           ],
                           controller: numberController,
                           decoration: new InputDecoration(
-                            border: const UnderlineInputBorder(),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide:  BorderSide(color: Colors.transparent),
+                            ),
                             filled: true,
                             icon: CardUtils.getCardIcon(_cardType),
                             labelText: 'Card Number',
                           ),
+                          style: TextStyle(
+                              color: widget.objectArgument.threeDS ? Colors.black45 : Colors.blue
+                          ),
+                          enabled: widget.objectArgument.threeDS? false : true,
                           onSaved: (String? value) {
                             _cardNumber = CardUtils.getCleanedNumber(value!);
                           },
@@ -187,16 +207,24 @@ class _NewPaymentState extends State<NewPayment> {
                             new LengthLimitingTextInputFormatter(4),
                           ],
                           decoration: new InputDecoration(
-                            border: const UnderlineInputBorder(),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide:  BorderSide(color: Colors.transparent),
+                            ),
                             filled: true,
                             icon: new Image.asset(
                               'assets/images/card_cvv.png',
                               width: 40.0,
-                              color: Colors.grey[600],
+                              color: Colors.grey,
                             ),
                             hintText: 'Number behind the card',
                             labelText: 'CVV',
                           ),
+                          style: TextStyle(
+                              color: widget.objectArgument.threeDS ? Colors.black45 : Colors.blue
+                          ),
+                          initialValue: widget.objectArgument.threeDS? threeDsPredefinedData["cvv"] : "",
+                          enabled: widget.objectArgument.threeDS? false : true,
                           validator: CardUtils.validateCVV,
                           keyboardType: TextInputType.number,
                           onSaved: (value) {
@@ -214,16 +242,24 @@ class _NewPaymentState extends State<NewPayment> {
                             new CardMonthInputFormatter()
                           ],
                           decoration: new InputDecoration(
-                            border: const UnderlineInputBorder(),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide:  BorderSide(color: Colors.transparent),
+                            ),
                             filled: true,
                             icon: new Image.asset(
                               'assets/images/calender.png',
                               width: 40.0,
-                              color: Colors.grey[600],
+                              color: Colors.grey,
                             ),
                             hintText: 'MM/YY',
                             labelText: 'Expiry Date',
                           ),
+                          style: TextStyle(
+                              color: widget.objectArgument.threeDS ? Colors.black45 : Colors.blue
+                          ),
+                          initialValue: widget.objectArgument.threeDS? '${threeDsPredefinedData["expiration_month"]}/${threeDsPredefinedData["expiration_year"]%100}' :"",
+                          enabled: widget.objectArgument.threeDS? false : true,
                           validator: CardUtils.validateDate,
                           keyboardType: TextInputType.number,
                           onSaved: (value) {
@@ -239,18 +275,10 @@ class _NewPaymentState extends State<NewPayment> {
                           alignment: Alignment.center,
                           child: Column(
                             children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  // _proceed();
-                                  _validateInputs();
-                                },
-                                child: Text('Start payment'),
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
+                             MonriButton(
+                                 (){_validateInputs();},
+                               'Start payment'
+                             ),
                               Text(_data.toString()),
                             ],
                           ),
@@ -270,6 +298,14 @@ class _NewPaymentState extends State<NewPayment> {
     ));
   }
 }
+
+const Map<String, dynamic> threeDsPredefinedData = {
+  "card_number": "4341792000000044",
+  "cvv": "123",
+  "expiration_month": 12,
+  "expiration_year": 2029,
+  "card_holder_name": "Adnan Omerović"
+};
 
 String _getJsonData({
   required String clientSecret,

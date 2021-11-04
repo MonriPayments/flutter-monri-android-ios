@@ -99,6 +99,27 @@ class SavedCardConfirmPaymentParams {
       "transaction_params": transactionParams.toJson()
     };
   }
+
+  static SavedCardConfirmPaymentParams fromJSON(Map<String, dynamic> json) {
+    //todo do we need this method
+    // TODO some validation?
+    if (!json.containsKey("authenticity_token")){
+      throw "CardConfirmPaymentParams::fromJson method doesn't have a key: ${1}";
+    }
+
+    TransactionParams trxParams = TransactionParams.create();
+    Map<String, String> tmpData = Map<String, String>.from(json["transaction_params"]);
+    trxParams.data = tmpData;
+
+    return SavedCardConfirmPaymentParams(
+        authenticityToken: json["authenticity_token"],
+        clientSecret: json["client_secret"],
+        panToken: json["card"]["pan_token"],
+        cvv: json["card"]["cvv"],
+        transactionParams: trxParams,
+        isDebug: json["is_development_mode"],
+    );
+  }
 }
 
 class _MonriPaymentsImpl extends MonriPayments {

@@ -12,49 +12,60 @@ class Home extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Monri Flutter Plugin example app'),
         ),
-        body: ListView(
-          children: [
-            MonriButton(() => {
-                      Navigator.pushNamed(
-                          context, AvailableAppRoutes.NEW_PAYMENT,
-                          arguments: {'req_arg': ObjectArgument(false, false)}
-                          )
-                    },
-                'new payment'
-            ),
-            MonriButton(() => {
-                  Navigator.pushNamed(
-                      context, AvailableAppRoutes.NEW_PAYMENT,
-                      arguments: {'req_arg': ObjectArgument(true, false)}
-                  )
-                },
-                'new payment save card'
-            ),
-            MonriButton(() => {
-              Navigator.pushNamed(
-                  context, AvailableAppRoutes.NEW_PAYMENT,
-                  arguments: {'req_arg': ObjectArgument(true, false)}
+        body: Padding(
+            padding: const EdgeInsets.all(10),
+          child: ListView(
+            children: [
+              MonriButton(() => {
+                    Navigator.pushNamed(
+                        context, AvailableAppRoutes.NEW_PAYMENT,
+                        arguments: {'req_arg': ObjectArgument(false, false)}
+                        )
+                  },
+                  'new payment'
+              ),
+              MonriButton(() => {
+                    Navigator.pushNamed(
+                        context, AvailableAppRoutes.NEW_PAYMENT,
+                        arguments: {'req_arg': ObjectArgument(true, false)}
+                    )
+                  },
+                  'new payment save card'
+              ),
+              MonriButton(() => {
+                Navigator.pushNamed(
+                    context, AvailableAppRoutes.NEW_PAYMENT,
+                    arguments: {'req_arg': ObjectArgument(false, true)}
+                )
+              },
+                  'new payment 3DS'
+              ),
+              MonriButton(() => {
+                Navigator.pushNamed(
+                    context, AvailableAppRoutes.NEW_PAYMENT,
+                    arguments: {'req_arg': ObjectArgument(true, true)}
+                )
+              },
+                  'new payment 3DS save card'
+              ),
+              MonriButton(() => {
+                Navigator.pushNamed(
+                    context, AvailableAppRoutes.SAVED_CARD,
+                    arguments: {'req_arg': ObjectArgument(true, false)}
+                )
+              },
+                  'pay with saved card'
+              ),
+              MonriButton(() => {
+                Navigator.pushNamed(
+                    context, AvailableAppRoutes.SAVED_CARD,
+                    arguments: {'req_arg': ObjectArgument(true, true)}
+                )
+              },
+                  'pay with 3DS saved card'
               )
-            },
-                'new payment 3DS'
-            ),
-            MonriButton(() => {
-              Navigator.pushNamed(
-                  context, AvailableAppRoutes.NEW_PAYMENT,
-                  arguments: {'req_arg': ObjectArgument(true, false)}
-              )
-            },
-                'new payment 3DS save card'
-            ),
-            MonriButton(() => {
-              Navigator.pushNamed(
-                  context, AvailableAppRoutes.NEW_PAYMENT,
-                  arguments: {'req_arg': ObjectArgument(true, false)}
-              )
-            },
-                'pay with saved card'
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );
