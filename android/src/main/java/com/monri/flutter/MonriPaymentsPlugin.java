@@ -2,13 +2,18 @@ package com.monri.flutter;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
-import androidx.core.util.Pair;
 
 import com.monri.android.Monri;
 import com.monri.android.model.ConfirmPaymentParams;
 import com.monri.android.model.MonriApiOptions;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -52,6 +57,9 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
         MonriApiOptions monriApiOptions = flutterConfirmPaymentParams.monriApiOptions();
         ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
+
+        MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
+
         this.monri = new Monri(this.activity, monriApiOptions);
         this.delegate.setMonri(this.monri);
         this.delegate.setConfirmPaymentResult(result);
@@ -126,5 +134,17 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         channel.setMethodCallHandler(null);
         channel = null;
         application = null;
+    }
+
+    private static void writeMetaData(Context context, String library) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("library", library);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        sharedPreferences.edit().putString("monri_cross_platform_meta_key", jsonObject.toString()).apply();
     }
 }

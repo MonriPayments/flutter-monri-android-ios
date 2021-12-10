@@ -125,19 +125,20 @@ class SavedCardConfirmPaymentParams {
 class _MonriPaymentsImpl extends MonriPayments {
   static const MethodChannel _channel = const MethodChannel('MonriPayments');
 
+  @override
   Future<PaymentResponse> confirmPayment(
       CardConfirmPaymentParams arguments) async {
     Map result = await _channel.invokeMethod('confirmPayment', arguments.toJSON());
     return PaymentResponse.fromJson(result);
   }
 
+  @override
   Future<PaymentResponse> savedCardPayment(
       SavedCardConfirmPaymentParams arguments) async {
     Map result = await _channel.invokeMethod('confirmPayment', arguments.toJSON());
     // print(result);
     return PaymentResponse.fromJson(result);
   }
-//confirmPayment
 }
 
 abstract class MonriPayments {

@@ -31,6 +31,15 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
+
+    buildTypes {
+        release {
+            buildConfigField "String", 'MONRI_FLUTTER_PLUGIN_VERSION', "\"${version}\""
+        }
+        debug {
+            buildConfigField "String", 'MONRI_FLUTTER_PLUGIN_VERSION', "\"${version}\""
+        }
+    }
 }
 
 dependencies {

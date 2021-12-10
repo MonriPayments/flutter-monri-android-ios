@@ -335,7 +335,7 @@ String _getJsonData({
       "zip": "71000",
       "phone": "N/A",
       "country": "BA",
-      "email": "s.nazdrajic@gmail.com",
+      "email": "monri.flutter@gmail.com",
       "custom_params": ""
   }
 }
