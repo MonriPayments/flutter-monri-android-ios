@@ -1,5 +1,5 @@
 group 'com.example.MonriPayments'
-version '1.0'
+version '1.0.0'
 
 buildscript {
     repositories {
@@ -22,7 +22,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 31
 
     defaultConfig {
         minSdkVersion 19
@@ -44,7 +44,5 @@ android {
 
 dependencies {
 //    implementation fileTree(dir: 'libs', include: ['*.jar'])
-//    implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'com.monri:monri-android:1.2.5'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
 }
