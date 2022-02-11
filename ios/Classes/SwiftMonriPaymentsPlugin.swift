@@ -73,7 +73,7 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
         }
     }
 
-    func writeMetaData(){
+    private func writeMetaData(){
         let version: String = Bundle(identifier: "org.cocoapods.MonriPayments")?.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
 
         let defaults = UserDefaults.standard
