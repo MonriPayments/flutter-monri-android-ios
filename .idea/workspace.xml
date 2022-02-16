@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fcc30567-14c6-4d24-9d7a-d59034394b24" name="Default Changelist" comment="Bumped Android Monri SDK version&#10;&#10;Bumped Android Monri SDK version.&#10;&#10;WP-925">
+    <list default="true" id="fcc30567-14c6-4d24-9d7a-d59034394b24" name="Default Changelist" comment="Minor changes&#10;&#10;Worked on metadata&#10;&#10;WP-925">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/Podfile.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +53,7 @@
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.DirectoryMappings" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
     <property name="show.migrate.to.gradle.popup" value="false" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -104,7 +104,21 @@
       <option name="project" value="LOCAL" />
       <updated>1644244455199</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Minor changes&#10;&#10;Worked on metadata&#10;&#10;WP-925">
+      <created>1644312634075</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1644312634075</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Minor changes&#10;&#10;Worked on metadata&#10;&#10;WP-925">
+      <created>1644612790886</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1644612790886</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -123,10 +137,14 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$USER_HOME$" />
+    </ignored-roots>
     <MESSAGE value="WP-801 Removed json dependencies&#10;&#10;&#10;Removed json dependencies.&#10;&#10;WP-801" />
     <MESSAGE value="Bumped Android Monri SDK version&#10;&#10;Bumped Android Monri SDK version.&#10;&#10;WP-925" />
     <MESSAGE value="Added meta data part for iOS&#10;&#10;Added meta data part for iOS, updated Android gradle, manifest stuffs.&#10;&#10;WP-925" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added meta data part for iOS&#10;&#10;Added meta data part for iOS, updated Android gradle, manifest stuffs.&#10;&#10;WP-925" />
+    <MESSAGE value="Minor changes&#10;&#10;Worked on metadata&#10;&#10;WP-925" />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor changes&#10;&#10;Worked on metadata&#10;&#10;WP-925" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

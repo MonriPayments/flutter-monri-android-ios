@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:7.0.2'
     }
 }
 
@@ -40,9 +40,13 @@ android {
             buildConfigField "String", 'MONRI_FLUTTER_PLUGIN_VERSION', "\"${version}\""
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
 }
 
 dependencies {
 //    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.monri:monri-android:1.2.5'
+    implementation 'com.monri:monri-android:1.3.+'
 }
