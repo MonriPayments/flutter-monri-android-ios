@@ -49,6 +49,8 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
         
             let confirmPaymentParams = params.confirmPaymentParams()
             let monriOptions = params.monriApiOptions()
+
+            writeMetaData()
             
             self.monri = MonriApi(rootViewController, options: monriOptions);
             
@@ -69,6 +71,13 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
         } catch {
             result(["error" : "An error occurred on confirmPayment - \(error)", "status": "error"]);
         }
+    }
+
+    private func writeMetaData(){
+        let version: String = Bundle(identifier: "org.cocoapods.MonriPayments")?.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+
+        let defaults = UserDefaults.standard
+        defaults.set("iOS-SDK:Flutter:\(version)", forKey: "com.monri.meta.library")
     }
 }
 
