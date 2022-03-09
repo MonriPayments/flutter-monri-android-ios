@@ -1,1 +1,0 @@
-flutter create --org com.example --template=plugin --platforms=android,ios -i swift -a java MonriPayments
