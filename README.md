@@ -11,6 +11,19 @@ dependencies:
   path: ../MonriPaymentsFlutter
 ```
 
+#### Android Gradle
+
+On your `build.gradle` file add this statement to the `dependencies` section:
+
+```groovy
+buildscript {
+    //...
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.2'
+    }
+}
+```
+
 ## Usage
 
 ```dart
@@ -22,38 +35,38 @@ import 'package:MonriPayments/MonriPayments.dart';
 final monriPayments = MonriPayments.create();
 
 Future<void> _continuePayment() async {
-    Map data = {};
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-        var clientSecret = "client_secret"; // create one on your backend
-        var arguments = jsonDecode(_getJsonData(
-            isDevelopment: true,
-            clientSecret: clientSecret,
-            cardNumber: "4341792000000044",
-            cvv: 123,
-            expirationMonth: 12,
-            expirationYear: 2030,
-            cardHolderName: "Adnan Omerovic",
-            tokenizePan: true
+  Map data = {};
+  // Platform messages may fail, so we use a try/catch PlatformException.
+  try {
+    var clientSecret = "client_secret"; // create one on your backend
+    var arguments = jsonDecode(_getJsonData(
+        isDevelopment: true,
+        clientSecret: clientSecret,
+        cardNumber: "4341792000000044",
+        cvv: 123,
+        expirationMonth: 12,
+        expirationYear: 2030,
+        cardHolderName: "Adnan Omerovic",
+        tokenizePan: true
     ));
-        data = (await monriPayments.confirmPayment(CardConfirmPaymentParams.fromJSON(arguments))).toJson();
-    } on PlatformException {
-        data = {};
-    }
+    data = (await monriPayments.confirmPayment(CardConfirmPaymentParams.fromJSON(arguments))).toJson();
+  } on PlatformException {
+    data = {};
+  }
 
 }
 
 String _getJsonData({
-    required String clientSecret,
-    required bool isDevelopment,
-    required String cardNumber,
-    required int cvv,
-    required int expirationMonth,
-    required int expirationYear,
-    required String cardHolderName,
-    required bool tokenizePan
+  required String clientSecret,
+  required bool isDevelopment,
+  required String cardNumber,
+  required int cvv,
+  required int expirationMonth,
+  required int expirationYear,
+  required String cardHolderName,
+  required bool tokenizePan
 }){
-    return """
+  return """
     {
         "is_development_mode": $isDevelopment,
         "authenticity_token": "a6d41095984fc60fe81cd3d65ecafe56d4060ca9", //available on merchant's dashboard
