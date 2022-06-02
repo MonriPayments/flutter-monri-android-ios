@@ -1,18 +1,102 @@
 # MonriPayments
 
-A new flutter plugin project.
+Flutter library for Monri Android/iOS SDK
 
-## Getting Started
+## Installation
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+Clone project in same tree view as your project. In pubspec.yaml add
+```yaml
+dependencies:
+  MonriPayments:
+  path: ../MonriPaymentsFlutter
+```
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+#### Android Gradle
 
-useful commands:
-flutter pub run build_runner build
-flutter pub run build_runner watch --delete-conflicting-outputs
+On your `build.gradle` file add this statement to the `dependencies` section:
+
+```groovy
+buildscript {
+    //...
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.2'
+    }
+}
+```
+
+## Usage
+
+```dart
+import 'package:MonriPayments/MonriPayments.dart';
+```
+
+```dart
+// ...
+final monriPayments = MonriPayments.create();
+
+Future<void> _continuePayment() async {
+  Map data = {};
+  // Platform messages may fail, so we use a try/catch PlatformException.
+  try {
+    var clientSecret = "client_secret"; // create one on your backend
+    var arguments = jsonDecode(_getJsonData(
+        isDevelopment: true,
+        clientSecret: clientSecret,
+        cardNumber: "4341792000000044",
+        cvv: 123,
+        expirationMonth: 12,
+        expirationYear: 2030,
+        cardHolderName: "Adnan Omerovic",
+        tokenizePan: true
+    ));
+    data = (await monriPayments.confirmPayment(CardConfirmPaymentParams.fromJSON(arguments))).toJson();
+  } on PlatformException {
+    data = {};
+  }
+
+}
+
+String _getJsonData({
+  required String clientSecret,
+  required bool isDevelopment,
+  required String cardNumber,
+  required int cvv,
+  required int expirationMonth,
+  required int expirationYear,
+  required String cardHolderName,
+  required bool tokenizePan
+}){
+  return """
+    {
+        "is_development_mode": $isDevelopment,
+        "authenticity_token": "a6d41095984fc60fe81cd3d65ecafe56d4060ca9", //available on merchant's dashboard
+        "client_secret": "$clientSecret",
+        "card": {
+        "pan": "$cardNumber",
+            "cvv": "$cvv",
+            "expiryMonth": "$expirationMonth",
+            "expiryYear": "$expirationYear",
+            "tokenize_pan": $tokenizePan
+    },
+        "transaction_params": {
+        "full_name": "$cardHolderName",
+            "address": "N/A",
+            "city": "Sarajevo",
+            "zip": "71000",
+            "phone": "N/A",
+            "country": "BA",
+            "email": "flutter@monri.com",
+            "custom_params": ""
+    }
+    }
+    """;
+}
+```
+
+## Contributing
+
+See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+
+## License
+
+MIT
