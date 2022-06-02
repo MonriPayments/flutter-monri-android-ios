@@ -6,7 +6,7 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-        android:name="io.flutter.app.FlutterApplication"
+        android:name="${applicationName}"
         android:label="MonriPayments_example"
         android:theme="@style/Theme.AppCompat.Light"
         android:icon="@mipmap/ic_launcher">
@@ -23,7 +23,8 @@
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
             <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
+              android:name="flutterEmbedding"
+              android:value="2"
               android:resource="@style/NormalTheme"
               />
             <!-- Displays an Android View that continues showing the launch screen
