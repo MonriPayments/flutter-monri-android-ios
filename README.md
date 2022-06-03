@@ -4,11 +4,12 @@ Flutter library for Monri Android/iOS SDK
 
 ## Installation
 
-Clone project in same tree view as your project. In pubspec.yaml add
+In pubspec.yaml add
 ```yaml
 dependencies:
   MonriPayments:
-  path: ../MonriPaymentsFlutter
+    git:
+      url: https://github.com/MonriPayments/flutter-monri-android-ios.git
 ```
 
 #### Android Gradle
