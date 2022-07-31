@@ -37,7 +37,7 @@ class _NewPaymentState extends State<NewPayment> {
   String? _cardNumber;
   int? _expirationMonth;
   int? _expirationYear;
-  int? _cvv;
+  String? _cvv;
 
   final monriPayments = MonriPayments.create();
   static const platform = MethodChannel('monri.create.payment.session.channel');
@@ -228,7 +228,7 @@ class _NewPaymentState extends State<NewPayment> {
                           validator: CardUtils.validateCVV,
                           keyboardType: TextInputType.number,
                           onSaved: (value) {
-                            _cvv = int.parse(value!);
+                            _cvv = value!;
                           },
                         ),
                         new SizedBox(
@@ -310,7 +310,7 @@ const Map<String, dynamic> threeDsPredefinedData = {
 String _getJsonData({
   required String clientSecret,
   required String cardNumber,
-  required int cvv,
+  required String cvv,
   required int expirationMonth,
   required int expirationYear,
   required String cardHolderName,

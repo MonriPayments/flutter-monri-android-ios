@@ -1,11 +1,11 @@
 import 'package:MonriPayments/src/customer_params.dart';
 
 class TransactionParams {
-  Map<String, String> data = {};
+  Map<String, dynamic> data = {};
 
   static TransactionParams create() => TransactionParams();
 
-  TransactionParams set(String key, String? value) {
+  TransactionParams set(String key, dynamic value) {
     if (value == null) {
       data.remove(key);
     } else {
