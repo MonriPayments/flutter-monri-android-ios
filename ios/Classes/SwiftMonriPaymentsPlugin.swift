@@ -60,8 +60,8 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
                     result(["status" : "result", "data" : paymentResult.toJSON()]);
                 case .declined(let confirmPaymentDeclined):
                     result(["status" : "declined", "data" : confirmPaymentDeclined.status]);
-                case .error:
-                    result(["status" : "error"]);
+                case .error(let error):
+                    result(["status" : "error", "data": ["error": error.localizedDescription]]);
                 case .pending:
                     result(["status" : "pending"]);
                 }

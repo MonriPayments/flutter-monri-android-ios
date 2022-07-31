@@ -64,16 +64,21 @@ class FlutterConfirmPaymentParams {
                                                             country: transactionParams.country
         )
         
-        return TransactionParams.create()
+        let rv = TransactionParams.create()
             .set(customerParams:customerParams)
             .set("custom_params", transactionParams.customParams)
+
+        if (transactionParams.moto ?? false) {
+            rv.set("moto", "true")
+        }
+        return rv;
     }
     
     
     private static  func savedCard(cardMap: Dictionary<String, AnyObject?>) -> FlutterSavedCard {
         return FlutterSavedCard(
             cardMap["pan_token"] as! String,
-            cardMap["cvv"] as! String
+            cardMap["cvv"] as? String
         )
     }
     
@@ -96,7 +101,8 @@ class FlutterConfirmPaymentParams {
             zip: transactionParamsJSON["zip"] as? String,
             phone: transactionParamsJSON["phone"] as? String,
             country: transactionParamsJSON["country"] as? String,
-            customParams:transactionParamsJSON["custom_params"] as? String
+            customParams:transactionParamsJSON["custom_params"] as? String,
+            moto: transactionParamsJSON["moto"] as? Bool
         )
         
         return FlutterConfirmPaymentParams(developmentMode, authenticityToken, clientSecret, card, savedCard, transactionParams)
@@ -135,8 +141,8 @@ class FlutterCard {
 
 class FlutterSavedCard {
     let panToken: String
-    let cvv: String
-    init(_ panToken: String, _ cvv:String) {
+    let cvv: String?
+    init(_ panToken: String, _ cvv:String?) {
         self.panToken = panToken
         self.cvv = cvv
     }
@@ -152,6 +158,7 @@ class FlutterTransactionParams {
     let phone: String?
     let country: String?
     let customParams: String?
+    let moto: Bool?
     
     init(orderInfo: String?,
          email: String?,
@@ -161,7 +168,8 @@ class FlutterTransactionParams {
          zip: String?,
          phone: String?,
          country: String?,
-         customParams: String?
+         customParams: String?,
+         moto: Bool?
     ) {
         self.orderInfo = orderInfo
         self.email = email
@@ -172,6 +180,7 @@ class FlutterTransactionParams {
         self.phone = phone
         self.country = country
         self.customParams = customParams
+        self.moto = moto
     }
 }
 

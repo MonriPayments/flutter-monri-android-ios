@@ -13,7 +13,8 @@ class PaymentResponse{
     }
 
     PaymentResponseStatus status;
-    Map<String, dynamic> data = Map<String, dynamic>.from(json["data"]);
+    Map<String, dynamic> data =
+        json.containsKey("data") ? Map<String, dynamic>.from(json["data"]) : {};
 
     switch (statusString) {
       case "approved" :

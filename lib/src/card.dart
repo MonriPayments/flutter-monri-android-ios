@@ -1,7 +1,6 @@
-
 import 'package:MonriPayments/src/payment_method.dart';
 
-class Card extends PaymentMethod{
+class Card extends PaymentMethod {
   String number;
   String cvc;
   int expMonth;
