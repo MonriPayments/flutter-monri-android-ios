@@ -36,6 +36,9 @@ android {
         release {
             buildConfigField "String", 'MONRI_FLUTTER_PLUGIN_VERSION', "\"${version}\""
         }
+        profile {
+            buildConfigField "String", 'MONRI_FLUTTER_PLUGIN_VERSION', "\"${version}\""
+        }
         debug {
             buildConfigField "String", 'MONRI_FLUTTER_PLUGIN_VERSION', "\"${version}\""
         }
