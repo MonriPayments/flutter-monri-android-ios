@@ -158,8 +158,7 @@ class _NewPaymentState extends State<NewPayment> {
                           onFieldSubmitted: (_) {
                             FocusScope.of(context).requestFocus(_cardNumberFocusNode);
                           },
-                          validator: (String? value) =>
-                          value!.isEmpty ? ValidationMessages.filedRequired : null,
+                          validator: CardUtils.validateCardHolderName,
                         ),
                         new SizedBox(
                           height: 30.0,
