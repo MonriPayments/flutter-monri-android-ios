@@ -49,7 +49,7 @@ class _SavedCardState extends State<SavedCard> {
           cvv: _cvv!,
           is3DS: widget.objectArgument.threeDS);
       data = (await monriPayments.savedCardPayment(arguments)).toJson();
-      // print(data);
+      print(data);
     } on PlatformException {
       data = {};
     }
@@ -153,8 +153,8 @@ class _SavedCardState extends State<SavedCard> {
 }
 
 const panToken =
-    "d5719409d1b8eb92adae0feccd2964b805f93ae3936fdd9d8fc01a800d094584";
-const maskedPan = "403530******4083";
+    "a341dc816ee6b9008ccf3cd80cf91bd0ee1c67d1eab93bdeef08420c099d9f59";
+const maskedPan = "411111******1111";
 const cardType = CardType.Visa;
 
 const panToken3DS =
@@ -177,7 +177,7 @@ SavedCardConfirmPaymentParams _getSavedCardJsonData(
       "moto": true
   };
       return new SavedCardConfirmPaymentParams(
-          authenticityToken: 'a6d41095984fc60fe81cd3d65ecafe56d4060ca9',
+          authenticityToken: 'c6301017117302601b823874972a97acce96f2df',
           clientSecret: clientSecret,
           cvv: (cvv ?? '').length > 0 ? cvv : null,
           panToken: is3DS ? panToken3DS : panToken,

@@ -86,9 +86,12 @@ class _NewPaymentState extends State<NewPayment> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> continuePayment() async {
     Map data = {};
-    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
+      print("💳 Payment flow started, tokenize card: ${widget.objectArgument.savedCard}");
+      
       var clientSecret = await platform.invokeMethod('monri.create.payment.session.method');
+      print("🔑 Got client secret: ${clientSecret.substring(0, 10)}..."); // Show partial secret for security
+      
       var arguments = jsonDecode(_getJsonData(
           clientSecret: clientSecret,
           cardNumber: _cardNumber!,
@@ -98,15 +101,21 @@ class _NewPaymentState extends State<NewPayment> {
           cardHolderName: _cardHolderName!,
           tokenize_pan: widget.objectArgument.savedCard
       ));
-      data = (await monriPayments.confirmPayment(CardConfirmPaymentParams.fromJSON(arguments))).toJson();
-      // print(data);
-    } on PlatformException {
-      data = {};
+      print("📤 Payment arguments prepared: ${widget.objectArgument.savedCard ? '(with tokenization)' : '(standard payment)'}");
+      
+      print("⏳ Calling monriPayments.confirmPayment...");
+      var result = await monriPayments.confirmPayment(CardConfirmPaymentParams.fromJSON(arguments));
+      data = result.toJson();
+      print("📥 Payment result: ${json.encode(data)}");
+    } on PlatformException catch (e) {
+      print("❌ Platform exception during payment: ${e.code}, ${e.message}");
+      print("❌ Details: ${e.details}");
+      data = {"status": "error", "message": e.message, "code": e.code};
+    } catch (e) {
+      print("❌ General exception during payment: $e");
+      data = {"status": "error", "message": e.toString()};
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
@@ -318,7 +327,7 @@ String _getJsonData({
   return """
 {
   "is_development_mode": true,
-  "authenticity_token": "a6d41095984fc60fe81cd3d65ecafe56d4060ca9",
+  "authenticity_token": "c6301017117302601b823874972a97acce96f2df",
   "client_secret": "$clientSecret",
   "card": {
     "pan": "$cardNumber",
