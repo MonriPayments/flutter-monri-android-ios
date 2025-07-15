@@ -80,21 +80,9 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         }
     }
 
-    @Override
-    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-        activityBinding = binding;
-        setup(
-                pluginBinding.getBinaryMessenger(),
-                (Application) pluginBinding.getApplicationContext(),
-                activityBinding.getActivity(),
-                null,
-                activityBinding);
-    }
-
     private void setup(
             final BinaryMessenger messenger, final Application application,
             final Activity activity,
-            final PluginRegistry.Registrar registrar,
             final ActivityPluginBinding activityBinding) {
 
         this.activity = activity;
@@ -102,14 +90,21 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         this.delegate = new MonriPaymentsDelegate(this.monri);
         channel = new MethodChannel(messenger, CHANNEL);
         channel.setMethodCallHandler(this);
-        if (registrar != null) {
-            // V1 embedding setup for activity listeners.
-            registrar.addActivityResultListener(delegate);
-        } else {
-            // V2 embedding setup for activity listeners.
+        
+        // V2 embedding setup for activity listeners.
+        if (activityBinding != null) {
             activityBinding.addActivityResultListener(delegate);
         }
+    }
 
+    @Override
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        activityBinding = binding;
+        setup(
+                pluginBinding.getBinaryMessenger(),
+                (Application) pluginBinding.getApplicationContext(),
+                activityBinding.getActivity(),
+                activityBinding);
     }
 
     @Override

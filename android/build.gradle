@@ -22,8 +22,13 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    namespace "com.monri.flutter"
     compileSdkVersion 31
 
+    buildFeatures {
+        buildConfig true
+    }
+    
     defaultConfig {
         minSdkVersion 19
         consumerProguardFiles 'proguard-rules.pro'
