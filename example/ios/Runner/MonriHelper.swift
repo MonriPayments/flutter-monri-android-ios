@@ -35,6 +35,8 @@ import CommonCrypto
         // Create digest
         let digestInput = "\(key)\(timestamp)\(authenticityToken)\(bodyAsString)"
         let digest = digestInput.sha512()
+
+        print("SHA512" + "da".sha512())
         
         // Create authorization header
         let authorization = "WP3-v2 \(authenticityToken) \(timestamp) \(digest)"
@@ -46,7 +48,7 @@ import CommonCrypto
         ]
         
         // Make request
-        Alamofire.request("https://ipgtest.monri.com/v2/payment/new",
+        AF.request("https://ipgtest.monri.com/v2/payment/new",
                         method: .post,
                         parameters: parameters,
                         encoding: JSONEncoding.default,
