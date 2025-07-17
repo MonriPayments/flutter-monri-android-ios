@@ -6,11 +6,19 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultCaller;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.ActivityResultRegistry;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 
+import com.monri.android.ActionResultConsumer;
 import com.monri.android.Monri;
+import com.monri.android.activity.ConfirmPaymentActivity;
 import com.monri.android.model.ConfirmPaymentParams;
 import com.monri.android.model.MonriApiOptions;
+import com.monri.android.model.PaymentResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,12 +44,21 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     private static final String CHANNEL = "MonriPayments";
     private static final String CONFIRM_PAYMENT = "confirmPayment";
     private MethodChannel channel;
+    private String token = "c6301017117302601b823874972a97acce96f2df";
+    private Boolean devMode = true;
     private MonriPaymentsDelegate delegate;
     private FlutterPluginBinding pluginBinding;
     private ActivityPluginBinding activityBinding;
     private Application application;
     private Activity activity;
     private Monri monri;
+
+    private void tryInitMonri() {
+        if (activity != null && token != null && devMode != null && monri == null){
+            MonriApiOptions monriApiOptions = new MonriApiOptions(token, devMode);
+            monri = new Monri((ActivityResultCaller)this.activity, monriApiOptions);
+        }
+    }
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
@@ -54,17 +71,48 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
 
     private void monriConfirmPayment(Object arguments, MethodChannel.Result result) {
+        
         FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
-        MonriApiOptions monriApiOptions = flutterConfirmPaymentParams.monriApiOptions();
         ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
 
         MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
 
-        this.monri = new Monri(this.activity, monriApiOptions);
-        this.delegate.setMonri(this.monri);
+        System.out.println("MonriPaymentsPlugin: monriConfirmPayment called with params: " + confirmPaymentParams.toString());
         this.delegate.setConfirmPaymentResult(result);
+        System.out.println("MonriPaymentsPlugin: calling confirmPayment with params: " + confirmPaymentParams.toString());
 
-        this.monri.confirmPayment(this.activity, confirmPaymentParams);
+        this.monri.confirmPayment(confirmPaymentParams, new ActionResultConsumer<PaymentResult>() {
+            @Override
+            public void accept(PaymentResult paymentResult, Throwable throwable) {
+                if (throwable != null) {
+                    result.error("payment_error", throwable.getMessage(), null);
+                    return;
+                }
+
+                if (paymentResult != null) {
+                    java.util.Map<String, Object> response = new java.util.HashMap<>();
+                    java.util.Map<String, Object> data = new java.util.HashMap<>();
+                    final String status = paymentResult.getStatus();
+
+                    data.put("status", paymentResult.getStatus());
+                    data.put("amount", paymentResult.getAmount());
+                    data.put("orderNumber", paymentResult.getOrderNumber());
+                    data.put("transactionType", paymentResult.getTransactionType());
+                    data.put("pan_token", paymentResult.getPanToken());
+                    java.util.List<String> errors = paymentResult.getErrors();
+                    if (errors != null) {
+                        data.put("errors", errors);
+                    }
+                    data.put("createdAt", paymentResult.getCreatedAt());
+                    data.put("currency", paymentResult.getCurrency());
+
+                    response.put("status", status);
+                    response.put("data", data);
+                    result.success(response);
+                }
+            }
+        });
+        System.out.println("MonriPaymentsPlugin: confirmPayment called");
     }
 
     @Override
@@ -87,9 +135,12 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
         this.activity = activity;
         this.application = application;
-        this.delegate = new MonriPaymentsDelegate(this.monri);
+        this.delegate = new MonriPaymentsDelegate(null); // Initialize with null
+
         channel = new MethodChannel(messenger, CHANNEL);
         channel.setMethodCallHandler(this);
+
+        tryInitMonri();
         
         // V2 embedding setup for activity listeners.
         if (activityBinding != null) {
@@ -123,11 +174,12 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
 
     private void tearDown() {
-        activityBinding.removeActivityResultListener(delegate);
-        activityBinding = null;
+        if (activityBinding != null) {
+            activityBinding.removeActivityResultListener(delegate);
+            activityBinding = null;
+        }
         delegate = null;
-        channel.setMethodCallHandler(null);
-        channel = null;
+        monri = null; // Also clear the monri instance
         application = null;
     }
 
