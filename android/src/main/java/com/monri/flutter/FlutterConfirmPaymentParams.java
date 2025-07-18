@@ -69,6 +69,7 @@ public class FlutterConfirmPaymentParams {
         return MonriApiOptions.create(authenticityToken, developmentMode);
     }
 
+    @SuppressWarnings("unchecked")
     private static FlutterCard card(Map<String, Object> cardMap) {
 
         String number = (String) cardMap.get("pan");
@@ -79,14 +80,25 @@ public class FlutterConfirmPaymentParams {
         return new FlutterCard(number, cvv, expYear, expMonth, tokenizePan);
     }
 
+    @SuppressWarnings("unchecked")
     private static FlutterSavedCard savedCard(Map<String, Object> cardMap) {
-        return new FlutterSavedCard((String) cardMap.get("pan_token"), (String) cardMap.get("cvv"));
+        return new FlutterSavedCard(
+                (String) cardMap.get("pan_token"),
+                (String) cardMap.get("cvv")
+        );
     }
 
+    @SuppressWarnings("unchecked")
     public static FlutterConfirmPaymentParams forCard(Map<String, Object> map) {
         return create(map, card((Map<String, Object>) map.get("card")), null);
     }
 
+    @SuppressWarnings("unchecked")
+    public static FlutterConfirmPaymentParams forSavedCard(Map<String, Object> map) {
+        return create(map, null, savedCard((Map<String, Object>) map.get("saved_card")));
+    }
+
+    @SuppressWarnings("unchecked")
     private static FlutterConfirmPaymentParams create(Map<String, Object> request, FlutterCard card,
             FlutterSavedCard savedCard) {
         String authenticityToken = (String) request.get("authenticity_token");
@@ -108,10 +120,6 @@ public class FlutterConfirmPaymentParams {
 
         return new FlutterConfirmPaymentParams(developmentMode, authenticityToken, clientSecret, card, savedCard,
                 transactionParams);
-    }
-
-    public static FlutterConfirmPaymentParams forSavedCard(Map<String, Object> map) {
-        return create(map, null, savedCard((Map<String, Object>) map.get("saved_card")));
     }
 
     static class FlutterTransactionParams {

@@ -41,17 +41,14 @@ public class MainActivity extends FlutterFragmentActivity {
 
     private void createPaymentSession(MethodChannel.Result result) {
         try {
-            MonriHttpHelper.createPaymentSession(new Consumer<String>() {
-                @Override
-                public void accept(String clientSecret) {
-                    if (clientSecret != null) {
-                        runOnUiThread(() -> result.success(clientSecret));
-                    } else {
-                        runOnUiThread(() -> result.error("PAYMENT_SESSION_ERROR", 
-                                "Failed to create payment session", null));
-                    }
+            MonriHttpHelper.createPaymentSession(clientSecret -> {
+                if (clientSecret != null) {
+                    result.success(clientSecret);
+                } else {
+                    result.error("PAYMENT_SESSION_ERROR",
+                            "Failed to create payment session", null);
                 }
-            }).execute();
+            });
         } catch (Exception e) {
             System.out.println("Error while creating payment");
             e.printStackTrace();

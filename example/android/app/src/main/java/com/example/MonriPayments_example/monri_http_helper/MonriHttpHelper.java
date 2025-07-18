@@ -1,6 +1,5 @@
 package com.example.MonriPayments_example.monri_http_helper;
 
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -24,8 +23,8 @@ import java.util.concurrent.Executors;
 
 public class MonriHttpHelper {
 
-    ExecutorService executor = Executors.newSingleThreadExecutor();
-    Handler handler = new Handler(Looper.getMainLooper());
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final Handler handler = new Handler(Looper.getMainLooper());
 
     public MonriHttpHelper() {
     }
@@ -61,121 +60,115 @@ public class MonriHttpHelper {
     private static final String MERCHANT_KEY = "key-e428ba618ebc232a595d0851398b8a5d"; // Replace with your actual key
     private static final String AUTHENTICITY_TOKEN = "c6301017117302601b823874972a97acce96f2df"; // Replace with your token
 
-    //todo error consumer...
-    public static AsyncTask<Void, Void, String> createPaymentSession(Consumer<String> consumer) {
-        return new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(final Void... voids) {
-                try {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("amount", 100);
-                    // Match Swift format with hyphen instead of underscore
-                    jsonObject.put("order_number", "order-" + System.currentTimeMillis() / 1000);
-                    jsonObject.put("currency", "EUR");
-                    jsonObject.put("transaction_type", "purchase");
-                    jsonObject.put("order_info", "Create payment session order info");
-                    jsonObject.put("scenario", "charge");
+    public static void createPaymentSession(Consumer<String> consumer) {
+        executor.execute(() -> {
+            final String result = performCreatePaymentSession();
+            handler.post(() -> consumer.accept(result));
+        });
+    }
 
-                    // Print full payload for comparison with Swift
-                    String bodyAsString = jsonObject.toString();
-                    System.out.println("Full JSON payload: " + bodyAsString);
+    private static String performCreatePaymentSession() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("amount", 100);
+            // Match Swift format with hyphen instead of underscore
+            jsonObject.put("order_number", "order-" + System.currentTimeMillis() / 1000);
+            jsonObject.put("currency", "EUR");
+            jsonObject.put("transaction_type", "purchase");
+            jsonObject.put("order_info", "Create payment session order info");
+            jsonObject.put("scenario", "charge");
 
-                    long timestamp = System.currentTimeMillis() / 1000;
+            // Print full payload for comparison with Swift
+            String bodyAsString = jsonObject.toString();
+            System.out.println("Full JSON payload: " + bodyAsString);
 
-                    // For debugging - print all components used in digest
-                    System.out.println("MERCHANT_KEY: " + MERCHANT_KEY);
-                    System.out.println("timestamp: " + timestamp);
-                    System.out.println("AUTHENTICITY_TOKEN: " + AUTHENTICITY_TOKEN);
-                    System.out.println("bodyAsString: " + bodyAsString);
+            long timestamp = System.currentTimeMillis() / 1000;
+            // For debugging - print all components used in digest
+            System.out.println("MERCHANT_KEY: " + MERCHANT_KEY);
+            System.out.println("timestamp: " + timestamp);
+            System.out.println("AUTHENTICITY_TOKEN: " + AUTHENTICITY_TOKEN);
+            System.out.println("bodyAsString: " + bodyAsString);
 
-                    String digest = generateDigest(MERCHANT_KEY, timestamp, AUTHENTICITY_TOKEN, bodyAsString);
-                    System.out.println("Generated digest: " + digest);
-                    System.out.println("SHA-512: " + sha512("da"));
+            String digest = generateDigest(MERCHANT_KEY, timestamp, AUTHENTICITY_TOKEN, bodyAsString);
+            System.out.println("Generated digest: " + digest);
+            System.out.println("SHA-512: " + sha512("da"));
 
-                    String authorization = "WP3-v2 " + AUTHENTICITY_TOKEN + " " + timestamp + " " + digest;
-                    System.out.println("Authorization header: " + authorization);
+            String authorization = "WP3-v2 " + AUTHENTICITY_TOKEN + " " + timestamp + " " + digest;
+            System.out.println("Authorization header: " + authorization);
 
-                    HashMap<String, String> headers = new HashMap<>();
-                    headers.put("Content-Type", "application/json");
-                    headers.put("Authorization", authorization);
+            HashMap<String, String> headers = new HashMap<>();
+            headers.put("Content-Type", "application/json");
+            headers.put("Authorization", authorization);
 
-                    final HttpURLConnection urlConnection =
-                            createHttpURLConnection(
-                                    BASE_URL + "/v2/payment/new",
-                                    MonriHttpMethod.POST,
-                                    headers
-                            );
+            final HttpURLConnection urlConnection =
+                    createHttpURLConnection(
+                            BASE_URL + "/v2/payment/new",
+                            MonriHttpMethod.POST,
+                            headers
+                    );
 
-                    // Print full request details
-                    System.out.println("Making request to: " + BASE_URL + "/v2/payment/new");
-                    System.out.println("With headers: " + headers);
+            // Print full request details
+            System.out.println("Making request to: " + BASE_URL + "/v2/payment/new");
+            System.out.println("With headers: " + headers);
 
-                    OutputStreamWriter wr = null;
-                    try {
-                        wr = new OutputStreamWriter(urlConnection.getOutputStream());
-                        wr.write(bodyAsString);
-                        wr.flush();
-                    } finally {
-                        if (wr != null) {
-                            wr.close();
-                        }
-                    }
-
-                    try {
-                        int responseCode = urlConnection.getResponseCode();
-                        System.out.println("Response code: " + responseCode);
-
-                        InputStream inputStream;
-                        if (responseCode >= 200 && responseCode < 300) {
-                            inputStream = new BufferedInputStream(urlConnection.getInputStream());
-                        } else {
-                            inputStream = new BufferedInputStream(urlConnection.getErrorStream());
-                        }
-
-                        // Read response
-                        BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
-                        StringBuilder jsonStringResponse = new StringBuilder();
-                        for (String line; (line = r.readLine()) != null; ) {
-                            jsonStringResponse.append(line).append('\n');
-                        }
-
-                        String responseString = jsonStringResponse.toString();
-                        System.out.println("Response from server: " + responseString);
-
-                        // Check if response looks like HTML
-                        if (responseString.trim().startsWith("<")) {
-                            System.out.println("Error: Server returned HTML instead of JSON");
-                            return null;
-                        }
-
-                        try {
-                            JSONObject jsonResponse = new JSONObject(responseString);
-                            if (jsonResponse.has("client_secret")) {
-                                return jsonResponse.getString("client_secret");
-                            } else {
-                                System.out.println("Response doesn't contain client_secret: " + responseString);
-                                return null;
-                            }
-                        } catch (Exception e) {
-                            System.out.println("JSON parsing error: " + e.getMessage());
-                            e.printStackTrace();
-                            return null;
-                        }
-                    } finally {
-                        urlConnection.disconnect();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+            OutputStreamWriter wr = null;
+            try {
+                wr = new OutputStreamWriter(urlConnection.getOutputStream());
+                wr.write(bodyAsString);
+                wr.flush();
+            } finally {
+                if (wr != null) {
+                    wr.close();
                 }
             }
 
-            @Override
-            protected void onPostExecute(final String value) {
-                super.onPostExecute(value);
-                consumer.accept(value);
+            try {
+                int responseCode = urlConnection.getResponseCode();
+                System.out.println("Response code: " + responseCode);
+
+                InputStream inputStream;
+                if (responseCode >= 200 && responseCode < 300) {
+                    inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                } else {
+                    inputStream = new BufferedInputStream(urlConnection.getErrorStream());
+                }
+
+                // Read response
+                BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder jsonStringResponse = new StringBuilder();
+                for (String line; (line = r.readLine()) != null; ) {
+                    jsonStringResponse.append(line).append('\n');
+                }
+
+                String responseString = jsonStringResponse.toString();
+                System.out.println("Response from server: " + responseString);
+
+                // Check if response looks like HTML
+                if (responseString.trim().startsWith("<")) {
+                    System.out.println("Error: Server returned HTML instead of JSON");
+                    return null;
+                }
+
+                try {
+                    JSONObject jsonResponse = new JSONObject(responseString);
+                    if (jsonResponse.has("client_secret")) {
+                        return jsonResponse.getString("client_secret");
+                    } else {
+                        System.out.println("Response doesn't contain client_secret: " + responseString);
+                        return null;
+                    }
+                } catch (Exception e) {
+                    System.out.println("JSON parsing error: " + e.getMessage());
+                    e.printStackTrace();
+                    return null;
+                }
+            } finally {
+                urlConnection.disconnect();
             }
-        };
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     // Add this helper method to generate the digest
@@ -215,21 +208,4 @@ public class MonriHttpHelper {
         throw new RuntimeException("SHA-512 algorithm not available", e);
     }
 }
-
-    public void createPaymentSessionNEW(Consumer<String> consumer){
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                //Background work here
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        //UI Thread work here
-                    }
-                });
-            }
-        });
-    }
 }
