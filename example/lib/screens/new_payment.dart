@@ -87,10 +87,7 @@ class _NewPaymentState extends State<NewPayment> {
   Future<void> continuePayment() async {
     Map data = {};
     try {
-      print("💳 Payment flow started, tokenize card: ${widget.objectArgument.savedCard}");
-      
       var clientSecret = await platform.invokeMethod('monri.create.payment.session.method');
-      print("🔑 Got client secret: ${clientSecret.substring(0, 10)}..."); // Show partial secret for security
       
       var arguments = jsonDecode(_getJsonData(
           clientSecret: clientSecret,
@@ -101,18 +98,11 @@ class _NewPaymentState extends State<NewPayment> {
           cardHolderName: _cardHolderName!,
           tokenize_pan: widget.objectArgument.savedCard
       ));
-      print("📤 Payment arguments prepared: ${widget.objectArgument.savedCard ? '(with tokenization)' : '(standard payment)'}");
-      
-      print("⏳ Calling monriPayments.confirmPayment...");
       var result = await monriPayments.confirmPayment(CardConfirmPaymentParams.fromJSON(arguments));
       data = result.toJson();
-      print("📥 Payment result: ${json.encode(data)}");
     } on PlatformException catch (e) {
-      print("❌ Platform exception during payment: ${e.code}, ${e.message}");
-      print("❌ Details: ${e.details}");
       data = {"status": "error", "message": e.message, "code": e.code};
     } catch (e) {
-      print("❌ General exception during payment: $e");
       data = {"status": "error", "message": e.toString()};
     }
 
