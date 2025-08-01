@@ -44,7 +44,7 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     private static final String CHANNEL = "MonriPayments";
     private static final String CONFIRM_PAYMENT = "confirmPayment";
     private MethodChannel channel;
-    private String authenticityToken = "c6301017117302601b823874972a97acce96f2df";
+    private String authenticityToken = "REPLACE_WITH_YOUR_AUTHENTICITY_TOKEN";
     private Boolean devMode = true;
     private FlutterPluginBinding pluginBinding;
     private ActivityPluginBinding activityBinding;

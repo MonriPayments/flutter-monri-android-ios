@@ -177,7 +177,7 @@ SavedCardConfirmPaymentParams _getSavedCardJsonData(
       "moto": true
   };
       return new SavedCardConfirmPaymentParams(
-          authenticityToken: 'c6301017117302601b823874972a97acce96f2df',
+          authenticityToken: 'authenticity-token',
           clientSecret: clientSecret,
           cvv: (cvv ?? '').length > 0 ? cvv : null,
           panToken: is3DS ? panToken3DS : panToken,

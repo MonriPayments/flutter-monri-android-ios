@@ -25,6 +25,15 @@ buildscript {
 }
 ```
 
+#### Android library
+
+In `MonriPaymentsPlugin.java` file, you have to set your authenticity token and set if it' development mode or not.
+
+```java
+private String authenticityToken = "REPLACE_WITH_YOUR_AUTHENTICITY_TOKEN";
+private Boolean devMode = true;
+```
+
 ## Usage
 
 ```dart

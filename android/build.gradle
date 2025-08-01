@@ -56,6 +56,6 @@ android {
 
 dependencies {
 //    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.monri:monri-android:3.0.+'
+    implementation 'com.monri:monri-android:3.0.1'
     implementation 'androidx.preference:preference:1.2.0'
 }

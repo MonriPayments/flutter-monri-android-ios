@@ -8,8 +8,8 @@ import CommonCrypto
 
 @objc public class MonriHelper: NSObject {
     // Authentication variables
-    private let key = "key-e428ba618ebc232a595d0851398b8a5d" // Replace with your actual key
-    private let authenticityToken = "c6301017117302601b823874972a97acce96f2df" // Replace with your actual token
+    private let key = "merchant-key" // Replace with your actual key
+    private let authenticityToken = "authenticity-token" // Replace with your actual token
     
     public func createPaymentSessionHelperFunc(_ callback: @escaping (NewPaymentResponse?) -> Void) {
         // Required payment parameters
