@@ -25,6 +25,17 @@ class CardUtils {
     return null;
   }
 
+  static String? validateCardHolderName(String? value) {
+    if (value == null || value.isEmpty) {
+      return ValidationMessages.filedRequired;
+    }
+
+    if (value.length < 3) {
+      return ValidationMessages.invalidName;
+    }
+    return null;
+  }
+
   static String? validateDate(String? value) {
     if (value == null || value.isEmpty) {
       return ValidationMessages.filedRequired;
@@ -96,7 +107,7 @@ class CardUtils {
     // has passed
     // 2. Card's month (plus another month) is more than current month.
     return hasYearPassed(year) ||
-        convertYearTo4Digits(year) == now.year && (month < now.month + 1);
+        convertYearTo4Digits(year) == now.year && (month < now.month);
   }
 
   static bool hasYearPassed(int year) {

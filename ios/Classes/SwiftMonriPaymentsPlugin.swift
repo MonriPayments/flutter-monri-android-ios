@@ -44,31 +44,39 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
     
     func confirmPayment(_ arguments: Any?, _ result: @escaping FlutterResult) {
         do {
-            
             let params = try buildFlutterConfirmPaymentParams(arguments)
-        
+            
+            // Log tokenization request if present
+            if let card = params.card {
+                // Safely log masked PAN (first 6 + last 4 digits)
+                let maskedPan = maskPan(card.pan)
+            } else if let savedCard = params.savedCard {
+            }
+            
             let confirmPaymentParams = params.confirmPaymentParams()
             let monriOptions = params.monriApiOptions()
-
+            
             writeMetaData()
             
             self.monri = MonriApi(rootViewController, options: monriOptions);
             
             monri.confirmPayment(confirmPaymentParams, { [result] confirmPayment in
-                switch confirmPayment{
+                switch confirmPayment {
                 case .result(let paymentResult):
                     result(["status" : "result", "data" : paymentResult.toJSON()]);
                 case .declined(let confirmPaymentDeclined):
                     result(["status" : "declined", "data" : confirmPaymentDeclined.status]);
                 case .error(let error):
+                    if let nsError = error as NSError? {
+                    }
                     result(["status" : "error", "data": ["error": error.localizedDescription]]);
                 case .pending:
                     result(["status" : "pending"]);
                 }
             });
-        } catch ConfigurationError.unsupportedPaymentMethod {
+        } catch let error as ConfigurationError {
             result(["error" : "Unsupported payment method, 'card' or 'saved_card' not found", "status": "error"]);
-        } catch {
+        } catch let error {
             result(["error" : "An error occurred on confirmPayment - \(error)", "status": "error"]);
         }
     }
@@ -107,4 +115,15 @@ extension String {
         let endIndex = index(from: r.upperBound)
         return substring(with: startIndex..<endIndex)
     }
+}
+
+// Helper function to mask card PAN
+private func maskPan(_ pan: String) -> String {
+  if pan.count > 10 {
+    let prefix = pan.prefix(6)
+    let suffix = pan.suffix(4)
+    return "\(prefix)******\(suffix)"
+  } else {
+    return "********" // Too short to properly mask
+  }
 }

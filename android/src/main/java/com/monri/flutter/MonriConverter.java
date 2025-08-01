@@ -10,6 +10,7 @@ public class MonriConverter {
     }
 
 
+    @SuppressWarnings("unchecked")
     FlutterConfirmPaymentParams process() {
         Map<String, Object> request = (Map<String, Object>) arguments;
 
