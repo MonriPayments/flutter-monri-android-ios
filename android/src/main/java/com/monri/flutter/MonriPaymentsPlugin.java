@@ -4,25 +4,15 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import androidx.preference.PreferenceManager;
-
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultCaller;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.ActivityResultRegistry;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.annotation.NonNull;
 
 import com.monri.android.ActionResultConsumer;
 import com.monri.android.Monri;
-import com.monri.android.activity.ConfirmPaymentActivity;
 import com.monri.android.model.ConfirmPaymentParams;
-import com.monri.android.model.MonriApiOptions;
 import com.monri.android.model.PaymentResult;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import androidx.activity.result.ActivityResultCaller;
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -31,7 +21,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
 
 /**
  * MonriPaymentsPlugin
@@ -44,7 +33,6 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     private static final String CHANNEL = "MonriPayments";
     private static final String CONFIRM_PAYMENT = "confirmPayment";
     private MethodChannel channel;
-    private String authenticityToken = "REPLACE_WITH_YOUR_AUTHENTICITY_TOKEN";
     private Boolean devMode = true;
     private FlutterPluginBinding pluginBinding;
     private ActivityPluginBinding activityBinding;
@@ -54,8 +42,7 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
     private void initMonri() {
         if (activity != null && monri == null) {
-            MonriApiOptions monriApiOptions = new MonriApiOptions(authenticityToken, devMode);
-            monri = new Monri((ActivityResultCaller)this.activity, monriApiOptions);
+            monri = new Monri((ActivityResultCaller)this.activity);
         }
     }
 
@@ -74,6 +61,8 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
 
         MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
+
+        monri.setMonriApiOptions(flutterConfirmPaymentParams.monriApiOptions());
 
         this.monri.confirmPayment(confirmPaymentParams, new ActionResultConsumer<PaymentResult>() {
             @Override
