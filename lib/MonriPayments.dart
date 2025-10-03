@@ -7,3 +7,5 @@ export 'src/payment_method.dart';
 export 'src/payment_method_params.dart';
 export 'src/transaction_params.dart';
 export 'src/payment_response.dart';
+export 'src/pk_payment_button_style.dart';
+export 'src/pk_payment_button_type.dart';

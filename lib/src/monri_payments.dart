@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:MonriPayments/MonriPayments.dart';
+import 'package:MonriPayments/src/pk_payment_button_style.dart';
+import 'package:MonriPayments/src/pk_payment_button_type.dart';
 import 'package:MonriPayments/src/test/monri_payments_test.dart';
 import 'package:flutter/services.dart';
 
@@ -13,22 +15,24 @@ class CardConfirmPaymentParams {
   final TransactionParams? transactionParams;
   final bool isDebug;
   final bool tokenizePan;
+  final String? applePayMerchantID;
 
-  CardConfirmPaymentParams({
-    required this.authenticityToken,
-    required this.clientSecret,
-    required this.cardNumber,
-    required this.cvv,
-    required this.expiryYear,
-    required this.expiryMonth,
-    required this.transactionParams,
-    required this.isDebug,
-    required this.tokenizePan,
-  });
+  CardConfirmPaymentParams(
+      {required this.authenticityToken,
+      required this.clientSecret,
+      required this.cardNumber,
+      required this.cvv,
+      required this.expiryYear,
+      required this.expiryMonth,
+      required this.transactionParams,
+      required this.isDebug,
+      required this.tokenizePan,
+      required this.applePayMerchantID});
 
   Map<String, dynamic> toJSON() {
     return {
       "authenticity_token": authenticityToken,
+      "applePayMerchantID": applePayMerchantID,
       "card": {
         "pan": cardNumber,
         "expiry_year": expiryYear,
@@ -63,7 +67,62 @@ class CardConfirmPaymentParams {
         expiryMonth: int.parse(json["card"]["expiryMonth"]),
         transactionParams: trxParams,
         isDebug: json["is_development_mode"],
-        tokenizePan: json["card"]["tokenize_pan"] ?? false);
+        tokenizePan: json["card"]["tokenize_pan"] ?? false,
+        applePayMerchantID: json["applePayMerchantID"]);
+  }
+}
+
+class ApplePayConfirmPaymentParams {
+  final String authenticityToken;
+  final String clientSecret;
+  final TransactionParams? transactionParams;
+  final bool isDebug;
+  final String? applePayMerchantID;
+  final PKPaymentButtonStyle? pkPaymentButtonStyle;
+  final PKPaymentButtonType? pkPaymentButtonType;
+
+  ApplePayConfirmPaymentParams(
+      {required this.authenticityToken,
+        required this.clientSecret,
+        required this.transactionParams,
+        required this.isDebug,
+        required this.applePayMerchantID,
+        required this.pkPaymentButtonStyle,
+        required this.pkPaymentButtonType});
+
+  Map<String, dynamic> toJSON() {
+    return {
+      "authenticity_token": authenticityToken,
+      "applePayMerchantID": applePayMerchantID,
+      "client_secret": clientSecret,
+      "is_development_mode": isDebug,
+      "transaction_params": transactionParams?.toJson() ?? {},
+      "pkPaymentButtonStyle" : pkPaymentButtonStyle?.rawValue ?? null,
+      "pkPaymentButtonType" : pkPaymentButtonType?.rawValue ?? null
+    };
+  }
+
+  static ApplePayConfirmPaymentParams fromJSON(Map<String, dynamic> json) {
+    if (!json.containsKey("authenticity_token")) {
+      throw "ApplePayConfirmPaymentParams::fromJson method doesn't have a key: ${1}";
+    }
+
+    TransactionParams trxParams = TransactionParams.create();
+    Map<String, String> tmpData =
+    Map<String, String>.from(json["transaction_params"]);
+    trxParams.data = tmpData;
+
+    var style = json["pkPaymentButtonStyle"] != null ? PKPaymentButtonStyle.fromRawValue(json["pkPaymentButtonStyle"]) : PKPaymentButtonStyle.black;
+    var type = json["pkPaymentButtonType"] != null ? PKPaymentButtonType.fromRawValue(json["pkPaymentButtonType"]) : PKPaymentButtonType.buy;
+
+    return ApplePayConfirmPaymentParams(
+        authenticityToken: json["authenticity_token"],
+        clientSecret: json["client_secret"],
+        transactionParams: trxParams,
+        isDebug: json["is_development_mode"],
+        applePayMerchantID: json["applePayMerchantID"],
+        pkPaymentButtonStyle: style,
+        pkPaymentButtonType: type);
   }
 }
 
@@ -139,6 +198,20 @@ class _MonriPaymentsImpl extends MonriPayments {
     // print(result);
     return PaymentResponse.fromJson(result);
   }
+
+  @override
+  Future<PaymentResponse> confirmApplePayPayment(ApplePayConfirmPaymentParams arguments) async {
+    Map result =
+        await _channel.invokeMethod('confirmApplePayment', arguments.toJSON());
+    // print(result);
+    return PaymentResponse.fromJson(result);
+  }
+
+  @override
+  Future<PaymentResponse> confirmGooglePayPayment(CardConfirmPaymentParams params) {
+    // TODO: implement confirmGooglePayPayment
+    throw UnimplementedError();
+  }
 }
 
 abstract class MonriPayments {
@@ -150,4 +223,8 @@ abstract class MonriPayments {
 
   Future<PaymentResponse> savedCardPayment(
       SavedCardConfirmPaymentParams params);
+
+  Future<PaymentResponse> confirmApplePayPayment(ApplePayConfirmPaymentParams arguments);
+
+  Future<PaymentResponse> confirmGooglePayPayment(CardConfirmPaymentParams params);
 }
