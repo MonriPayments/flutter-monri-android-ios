@@ -3,10 +3,13 @@ package com.monri.flutter;
 import com.monri.android.model.Card;
 import com.monri.android.model.ConfirmPaymentParams;
 import com.monri.android.model.CustomerParams;
+import com.monri.android.model.GooglePayPayment;
 import com.monri.android.model.MonriApiOptions;
 import com.monri.android.model.PaymentMethodParams;
 import com.monri.android.model.SavedCard;
 import com.monri.android.model.TransactionParams;
+
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -21,20 +24,27 @@ public class FlutterConfirmPaymentParams {
 
     private FlutterTransactionParams transactionParams;
 
+    private JSONObject googlePayData;
+
     private FlutterConfirmPaymentParams(boolean developmentMode, String authenticityToken, String clientSecret,
-            FlutterCard card, FlutterSavedCard savedCard, FlutterTransactionParams transactionParams) {
+            FlutterCard card, FlutterSavedCard savedCard, FlutterTransactionParams transactionParams, JSONObject googlePayData) {
         this.developmentMode = developmentMode;
         this.authenticityToken = authenticityToken;
         this.clientSecret = clientSecret;
         this.card = card;
         this.savedCard = savedCard;
         this.transactionParams = transactionParams;
+        this.googlePayData = googlePayData;
     }
 
     private PaymentMethodParams paymentMethodParams() {
         if (card != null) {
             return new Card(card.pan, card.month, card.year, card.cvv).setTokenizePan(card.tokenizePan)
                     .toPaymentMethodParams();
+        } else if ( savedCard != null) {
+            return new SavedCard(savedCard.panToken, savedCard.cvv).toPaymentMethodParams();
+        } else if (googlePayData != null) {
+            return new GooglePayPayment(GooglePayPayment.Provider.GOOGLE_PAY, googlePayData).toPaymentMethodParams();
         } else {
             return new SavedCard(savedCard.panToken, savedCard.cvv).toPaymentMethodParams();
         }
@@ -69,6 +79,10 @@ public class FlutterConfirmPaymentParams {
         return MonriApiOptions.create(authenticityToken, developmentMode);
     }
 
+    MonriApiOptions monriApiOptions(String authenticityToken, boolean developmentMode) {
+        return MonriApiOptions.create(authenticityToken, developmentMode);
+    }
+
     @SuppressWarnings("unchecked")
     private static FlutterCard card(Map<String, Object> cardMap) {
 
@@ -90,17 +104,22 @@ public class FlutterConfirmPaymentParams {
 
     @SuppressWarnings("unchecked")
     public static FlutterConfirmPaymentParams forCard(Map<String, Object> map) {
-        return create(map, card((Map<String, Object>) map.get("card")), null);
+        return create(map, card((Map<String, Object>) map.get("card")), null, null);
     }
 
     @SuppressWarnings("unchecked")
     public static FlutterConfirmPaymentParams forSavedCard(Map<String, Object> map) {
-        return create(map, null, savedCard((Map<String, Object>) map.get("saved_card")));
+        return create(map, null, savedCard((Map<String, Object>) map.get("saved_card")), null);
+    }
+
+    public static FlutterConfirmPaymentParams forGooglePay(Map<String, Object> map) {
+        return create(map, null, null, null);
     }
 
     @SuppressWarnings("unchecked")
     private static FlutterConfirmPaymentParams create(Map<String, Object> request, FlutterCard card,
-            FlutterSavedCard savedCard) {
+            FlutterSavedCard savedCard, JSONObject googlePayData) {
+
         String authenticityToken = (String) request.get("authenticity_token");
         String clientSecret = (String) request.get("client_secret");
         boolean developmentMode = (boolean) request.get("is_development_mode");
@@ -119,7 +138,7 @@ public class FlutterConfirmPaymentParams {
                 (Boolean) transactionParamsJSON.get("moto"));
 
         return new FlutterConfirmPaymentParams(developmentMode, authenticityToken, clientSecret, card, savedCard,
-                transactionParams);
+                transactionParams, googlePayData);
     }
 
     static class FlutterTransactionParams {

@@ -57,8 +57,8 @@ public class MonriHttpHelper {
     }
 
     private static final String BASE_URL = "https://ipgtest.monri.com";
-    private static final String MERCHANT_KEY = "merchant-key"; // Replace with your actual key
-    private static final String AUTHENTICITY_TOKEN = "authenticity-token"; // Replace with your token
+    private static final String MERCHANT_KEY = "key-e428ba618ebc232a595d0851398b8a5d"; // Replace with your actual key
+    private static final String AUTHENTICITY_TOKEN = "c6301017117302601b823874972a97acce96f2df"; // Replace with your token
 
     public static void createPaymentSession(Consumer<String> consumer) {
         executor.execute(() -> {

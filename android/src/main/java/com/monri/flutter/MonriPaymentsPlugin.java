@@ -4,15 +4,29 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+import android.view.View;
 
+import com.google.android.gms.wallet.PaymentsClient;
+import com.google.android.gms.wallet.Wallet;
+import com.google.android.gms.wallet.WalletConstants;
 import com.monri.android.ActionResultConsumer;
 import com.monri.android.Monri;
+import com.monri.android.ResultCallback;
+import com.monri.android.google_pay.MonriGooglePaymentRequestHelper;
 import com.monri.android.model.ConfirmPaymentParams;
+import com.monri.android.model.MonriApiOptions;
 import com.monri.android.model.PaymentResult;
 
 import androidx.activity.result.ActivityResultCaller;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Map;
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -32,6 +46,7 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     /// when the Flutter Engine is detached from the Activity
     private static final String CHANNEL = "MonriPayments";
     private static final String CONFIRM_PAYMENT = "confirmPayment";
+    private static final String CONFIRM_GOOGLE_PAY = "confirmGooglePayment";
     private MethodChannel channel;
     private Boolean devMode = true;
     private FlutterPluginBinding pluginBinding;
@@ -50,6 +65,8 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         if (CONFIRM_PAYMENT.equals(call.method)) {
             monriConfirmPayment(call.arguments, result);
+        } else if (CONFIRM_GOOGLE_PAY.equals(call.method)) {
+            confirmGooglePayPayment(call.arguments, result);
         } else {
             result.notImplemented();
         }
@@ -57,14 +74,14 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
     private void monriConfirmPayment(Object arguments, MethodChannel.Result result) {
         
-        FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
+        FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process(null);
         ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
 
         MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
 
         monri.setMonriApiOptions(flutterConfirmPaymentParams.monriApiOptions());
 
-        this.monri.confirmPayment(confirmPaymentParams, new ActionResultConsumer<PaymentResult>() {
+        this.monri.confirmPayment(confirmPaymentParams, new ActionResultConsumer<>() {
             @Override
             public void accept(PaymentResult paymentResult, Throwable throwable) {
                 if (throwable != null) {
@@ -97,6 +114,47 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         });
     }
 
+    private void confirmGooglePayPayment(Object arguments, MethodChannel.Result result) {
+
+        FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
+
+        ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
+
+        MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
+
+
+        Log.d("gpay", "confirm payment params" + confirmPaymentParams.getPaymentMethod().toString());
+        Log.d("gpay", "confirm payment params" + confirmPaymentParams.getTransaction().toString());
+
+        this.monri.confirmPayment(confirmPaymentParams, (paymentResult, throwable) -> {
+            if (throwable != null) {
+                result.error("payment_error", throwable.getMessage(), null);
+                return;
+            }
+
+            if (paymentResult != null) {
+                Map<String, Object> response = new java.util.HashMap<>();
+                Map<String, Object> data = new java.util.HashMap<>();
+                final String status = paymentResult.getStatus();
+
+                data.put("status", paymentResult.getStatus());
+                data.put("amount", paymentResult.getAmount());
+                data.put("orderNumber", paymentResult.getOrderNumber());
+                data.put("transactionType", paymentResult.getTransactionType());
+                data.put("pan_token", paymentResult.getPanToken());
+                java.util.List<String> errors = paymentResult.getErrors();
+                if (errors != null) {
+                    data.put("errors", errors);
+                }
+                data.put("createdAt", paymentResult.getCreatedAt());
+                data.put("currency", paymentResult.getCurrency());
+
+                response.put("status", status);
+                response.put("data", data);
+                result.success(response);
+            }
+        });
+    }
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
         pluginBinding = binding;

@@ -1,5 +1,5 @@
 group 'com.example.MonriPayments'
-version '1.0.0'
+version '1.1.0'
 
 buildscript {
     repositories {
@@ -56,6 +56,7 @@ android {
 
 dependencies {
 //    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.monri:monri-android:3.0.2'
+    implementation 'com.monri:monri-android:3.1.0'
     implementation 'androidx.preference:preference:1.2.0'
+    implementation 'com.google.android.gms:play-services-wallet:19.5.0'
 }
