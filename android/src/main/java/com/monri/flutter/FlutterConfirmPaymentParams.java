@@ -44,7 +44,7 @@ public class FlutterConfirmPaymentParams {
         } else if (googlePayData != null) {
             return new GooglePayPayment(GooglePayPayment.Provider.GOOGLE_PAY).toPaymentMethodParams();
         } else {
-            return new SavedCard(savedCard.panToken, savedCard.cvv).toPaymentMethodParams();
+            throw new IllegalArgumentException("Unsupported payment method, 'card', 'saved_card' or 'googlepay' not found");
         }
     }
 
@@ -144,8 +144,8 @@ public class FlutterConfirmPaymentParams {
     }
 
     @SuppressWarnings("unchecked")
-    private static FlutterConfirmPaymentParams create(Map<String, Object> request, FlutterCard card,
-                                                      FlutterSavedCard savedCard, FlutterGooglePay googlePayData) {
+    private static FlutterConfirmPaymentParams create(final Map<String, Object> request, final FlutterCard card,
+                                                      final FlutterSavedCard savedCard, final FlutterGooglePay googlePayData) {
 
         String authenticityToken = (String) request.get("authenticity_token");
         String clientSecret = (String) request.get("client_secret");
