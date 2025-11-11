@@ -8,6 +8,7 @@ import com.monri.android.model.MonriApiOptions;
 import com.monri.android.model.PaymentMethodParams;
 import com.monri.android.model.SavedCard;
 import com.monri.android.model.TransactionParams;
+
 import java.util.Map;
 
 public class FlutterConfirmPaymentParams {
@@ -24,7 +25,7 @@ public class FlutterConfirmPaymentParams {
     private FlutterGooglePay googlePayData;
 
     private FlutterConfirmPaymentParams(boolean developmentMode, String authenticityToken, String clientSecret,
-            FlutterCard card, FlutterSavedCard savedCard, FlutterTransactionParams transactionParams, FlutterGooglePay googlePayData) {
+                                        FlutterCard card, FlutterSavedCard savedCard, FlutterTransactionParams transactionParams, FlutterGooglePay googlePayData) {
         this.developmentMode = developmentMode;
         this.authenticityToken = authenticityToken;
         this.clientSecret = clientSecret;
@@ -37,8 +38,8 @@ public class FlutterConfirmPaymentParams {
     private PaymentMethodParams paymentMethodParams() {
         if (card != null) {
             return new Card(card.pan, card.month, card.year, card.cvv).setTokenizePan(card.tokenizePan)
-                    .toPaymentMethodParams();
-        } else if ( savedCard != null) {
+                                                                      .toPaymentMethodParams();
+        } else if (savedCard != null) {
             return new SavedCard(savedCard.panToken, savedCard.cvv).toPaymentMethodParams();
         } else if (googlePayData != null) {
             return new GooglePayPayment(GooglePayPayment.Provider.GOOGLE_PAY).toPaymentMethodParams();
@@ -58,8 +59,8 @@ public class FlutterConfirmPaymentParams {
                 .setEmail(transactionParams.email);
 
         final TransactionParams rv = TransactionParams.create()
-                .set("custom_params", transactionParams.customParams)
-                .set(customerParams);
+                                                      .set("custom_params", transactionParams.customParams)
+                                                      .set(customerParams);
 
         if (Boolean.TRUE.equals(transactionParams.moto)) {
             rv.set("moto", "true");
@@ -144,7 +145,7 @@ public class FlutterConfirmPaymentParams {
 
     @SuppressWarnings("unchecked")
     private static FlutterConfirmPaymentParams create(Map<String, Object> request, FlutterCard card,
-            FlutterSavedCard savedCard, FlutterGooglePay googlePayData) {
+                                                      FlutterSavedCard savedCard, FlutterGooglePay googlePayData) {
 
         String authenticityToken = (String) request.get("authenticity_token");
         String clientSecret = (String) request.get("client_secret");
@@ -164,10 +165,11 @@ public class FlutterConfirmPaymentParams {
                 (Boolean) transactionParamsJSON.get("moto"));
 
         return new FlutterConfirmPaymentParams(developmentMode, authenticityToken, clientSecret, card, savedCard,
-                transactionParams, googlePayData);
+                                               transactionParams, googlePayData);
     }
 
     static class FlutterTransactionParams {
+
         String orderInfo;
         String email;
         String fullName;
@@ -180,15 +182,15 @@ public class FlutterConfirmPaymentParams {
         Boolean moto;
 
         FlutterTransactionParams(String orderInfo,
-                String email,
-                String fullName,
-                String address,
-                String city,
-                String zip,
-                String country,
-                String customParams,
-                String phone,
-                Boolean moto) {
+                                 String email,
+                                 String fullName,
+                                 String address,
+                                 String city,
+                                 String zip,
+                                 String country,
+                                 String customParams,
+                                 String phone,
+                                 Boolean moto) {
             this.orderInfo = orderInfo;
             this.email = email;
             this.fullName = fullName;
@@ -203,6 +205,7 @@ public class FlutterConfirmPaymentParams {
     }
 
     static class FlutterCard {
+
         String pan;
         String cvv;
         int year;
@@ -210,7 +213,7 @@ public class FlutterConfirmPaymentParams {
         boolean tokenizePan;
 
         FlutterCard(String pan, String cvv, int year,
-                int month, boolean tokenizePan) {
+                    int month, boolean tokenizePan) {
             this.pan = pan;
             this.cvv = cvv;
             this.tokenizePan = tokenizePan;
@@ -220,6 +223,7 @@ public class FlutterConfirmPaymentParams {
     }
 
     static class FlutterSavedCard {
+
         String panToken;
         String cvv;
 
@@ -230,11 +234,12 @@ public class FlutterConfirmPaymentParams {
     }
 
     static class FlutterGooglePay {
-        int gPayTheme;
-        int gPayButtonType;
-        int gPayCornerRadius;
 
-        FlutterGooglePay(int gPayTheme, int gPayButtonType, int gPayCornerRadius) {
+        final int gPayTheme;
+        final int gPayButtonType;
+        final int gPayCornerRadius;
+
+        FlutterGooglePay(final int gPayTheme, final int gPayButtonType, final int gPayCornerRadius) {
             this.gPayTheme = gPayTheme;
             this.gPayButtonType = gPayButtonType;
             this.gPayCornerRadius = gPayCornerRadius;
