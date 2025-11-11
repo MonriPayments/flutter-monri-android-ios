@@ -22,7 +22,7 @@ public class MonriConverter {
             flutterConfirmPaymentParams = FlutterConfirmPaymentParams.forCard(request);
         } else if (request.containsKey("saved_card")) {
             flutterConfirmPaymentParams = FlutterConfirmPaymentParams.forSavedCard(request);
-        } else if (request.containsKey("googlePay")) {
+        } else if (request.containsKey("gPayButtonType") || request.containsKey("gPayButtonTheme") || request.containsKey("gPayCornerRadius")) {
             flutterConfirmPaymentParams = FlutterConfirmPaymentParams.forGooglePay(request);
         } else {
             throw new IllegalStateException("Unsupported payment method, 'card', 'saved_card' or 'googlepay' not found");

@@ -1,7 +1,7 @@
 /// Google Pay button themes
 enum GPayButtonTheme {
-  light(0),
-  dark(1);
+  dark(1),
+  light(2);
 
   final int rawValue;
   const GPayButtonTheme(this.rawValue);

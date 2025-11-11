@@ -1,13 +1,15 @@
 /// Google Pay button types
 enum GPayButtonType {
-  pay(0),
   buy(1),
-  checkout(2),
-  book(3),
+  book(2),
+  checkout(3),
   donate(4),
   order(5),
-  subscribe(6),
-  contribute(7);
+  pay(6),
+  subscribe(7),
+  plain(8),
+  pix(9),
+  ewallet(10);
 
   final int rawValue;
   const GPayButtonType(this.rawValue);

@@ -85,12 +85,12 @@ class ApplePayConfirmPaymentParams {
 
   ApplePayConfirmPaymentParams(
       {required this.authenticityToken,
-        required this.clientSecret,
-        required this.transactionParams,
-        required this.isDebug,
-        required this.applePayMerchantID,
-        required this.pkPaymentButtonStyle,
-        required this.pkPaymentButtonType});
+      required this.clientSecret,
+      required this.transactionParams,
+      required this.isDebug,
+      required this.applePayMerchantID,
+      required this.pkPaymentButtonStyle,
+      required this.pkPaymentButtonType});
 
   Map<String, dynamic> toJSON() {
     return {
@@ -99,8 +99,8 @@ class ApplePayConfirmPaymentParams {
       "client_secret": clientSecret,
       "is_development_mode": isDebug,
       "transaction_params": transactionParams?.toJson() ?? {},
-      "pkPaymentButtonStyle" : pkPaymentButtonStyle?.rawValue ?? null,
-      "pkPaymentButtonType" : pkPaymentButtonType?.rawValue ?? null
+      "pkPaymentButtonStyle": pkPaymentButtonStyle?.rawValue ?? null,
+      "pkPaymentButtonType": pkPaymentButtonType?.rawValue ?? null
     };
   }
 
@@ -111,11 +111,15 @@ class ApplePayConfirmPaymentParams {
 
     TransactionParams trxParams = TransactionParams.create();
     Map<String, String> tmpData =
-    Map<String, String>.from(json["transaction_params"]);
+        Map<String, String>.from(json["transaction_params"]);
     trxParams.data = tmpData;
 
-    var style = json["pkPaymentButtonStyle"] != null ? PKPaymentButtonStyle.fromRawValue(json["pkPaymentButtonStyle"]) : PKPaymentButtonStyle.black;
-    var type = json["pkPaymentButtonType"] != null ? PKPaymentButtonType.fromRawValue(json["pkPaymentButtonType"]) : PKPaymentButtonType.buy;
+    var style = json["pkPaymentButtonStyle"] != null
+        ? PKPaymentButtonStyle.fromRawValue(json["pkPaymentButtonStyle"])
+        : PKPaymentButtonStyle.black;
+    var type = json["pkPaymentButtonType"] != null
+        ? PKPaymentButtonType.fromRawValue(json["pkPaymentButtonType"])
+        : PKPaymentButtonType.buy;
 
     return ApplePayConfirmPaymentParams(
         authenticityToken: json["authenticity_token"],
@@ -133,17 +137,18 @@ class GooglePayConfirmPaymentParams {
   final String clientSecret;
   final TransactionParams? transactionParams;
   final bool isDebug;
-  final GPayButtonType? gPayButtonType;
-  final GPayButtonTheme? gPayButtonTheme;
+  final GPayButtonType gPayButtonType;
+  final GPayButtonTheme gPayButtonTheme;
+  final int gPayCornerRadius;
 
   GooglePayConfirmPaymentParams(
       {required this.authenticityToken,
-        required this.clientSecret,
-        required this.transactionParams,
-        required this.isDebug,
-        required this.gPayButtonTheme,
-        required this.gPayButtonType
-      });
+      required this.clientSecret,
+      required this.transactionParams,
+      required this.isDebug,
+      required this.gPayButtonTheme,
+      required this.gPayButtonType,
+      required this.gPayCornerRadius});
 
   Map<String, dynamic> toJSON() {
     return {
@@ -151,8 +156,9 @@ class GooglePayConfirmPaymentParams {
       "client_secret": clientSecret,
       "is_development_mode": isDebug,
       "transaction_params": transactionParams?.toJson() ?? {},
-      "gPayButtonType": gPayButtonType?.rawValue ?? null,
-      "gPayButtonTheme": gPayButtonTheme?.rawValue ?? null
+      "gPayButtonType": gPayButtonType.rawValue,
+      "gPayButtonTheme": gPayButtonTheme.rawValue,
+      "gPayCornerRadius": gPayCornerRadius,
     };
   }
 
@@ -163,7 +169,7 @@ class GooglePayConfirmPaymentParams {
 
     TransactionParams trxParams = TransactionParams.create();
     Map<String, String> tmpData =
-    Map<String, String>.from(json["transaction_params"]);
+        Map<String, String>.from(json["transaction_params"]);
     trxParams.data = tmpData;
 
     return GooglePayConfirmPaymentParams(
@@ -171,8 +177,9 @@ class GooglePayConfirmPaymentParams {
         clientSecret: json["client_secret"],
         transactionParams: trxParams,
         isDebug: json["is_development_mode"],
-    gPayButtonTheme: json[""],
-    gPayButtonType: json[""]);
+        gPayButtonTheme: json["gPayButtonTheme"] != null ? GPayButtonTheme.fromRawValue(json["gPayButtonTheme"])! : GPayButtonTheme.dark,
+        gPayButtonType: json["gPayButtonType"] != null ? GPayButtonType.fromRawValue(json["gPayButtonType"])! : GPayButtonType.buy,
+        gPayCornerRadius: json["gPayCornerRadius"] ?? 100);
   }
 }
 
@@ -250,7 +257,8 @@ class _MonriPaymentsImpl extends MonriPayments {
   }
 
   @override
-  Future<PaymentResponse> confirmApplePayPayment(ApplePayConfirmPaymentParams arguments) async {
+  Future<PaymentResponse> confirmApplePayPayment(
+      ApplePayConfirmPaymentParams arguments) async {
     Map result =
         await _channel.invokeMethod('confirmApplePayment', arguments.toJSON());
     // print(result);
@@ -258,7 +266,8 @@ class _MonriPaymentsImpl extends MonriPayments {
   }
 
   @override
-  Future<PaymentResponse> confirmGooglePayPayment(GooglePayConfirmPaymentParams arguments) async {
+  Future<PaymentResponse> confirmGooglePayPayment(
+      GooglePayConfirmPaymentParams arguments) async {
     Map result =
         await _channel.invokeMethod('confirmGooglePayment', arguments.toJSON());
     // print(result);
@@ -276,7 +285,9 @@ abstract class MonriPayments {
   Future<PaymentResponse> savedCardPayment(
       SavedCardConfirmPaymentParams params);
 
-  Future<PaymentResponse> confirmApplePayPayment(ApplePayConfirmPaymentParams arguments);
+  Future<PaymentResponse> confirmApplePayPayment(
+      ApplePayConfirmPaymentParams arguments);
 
-  Future<PaymentResponse> confirmGooglePayPayment(GooglePayConfirmPaymentParams params);
+  Future<PaymentResponse> confirmGooglePayPayment(
+      GooglePayConfirmPaymentParams params);
 }

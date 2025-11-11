@@ -8,9 +8,6 @@ import com.monri.android.model.MonriApiOptions;
 import com.monri.android.model.PaymentMethodParams;
 import com.monri.android.model.SavedCard;
 import com.monri.android.model.TransactionParams;
-
-import org.json.JSONObject;
-
 import java.util.Map;
 
 public class FlutterConfirmPaymentParams {
@@ -24,10 +21,10 @@ public class FlutterConfirmPaymentParams {
 
     private FlutterTransactionParams transactionParams;
 
-    private JSONObject googlePayData;
+    private FlutterGooglePay googlePayData;
 
     private FlutterConfirmPaymentParams(boolean developmentMode, String authenticityToken, String clientSecret,
-            FlutterCard card, FlutterSavedCard savedCard, FlutterTransactionParams transactionParams, JSONObject googlePayData) {
+            FlutterCard card, FlutterSavedCard savedCard, FlutterTransactionParams transactionParams, FlutterGooglePay googlePayData) {
         this.developmentMode = developmentMode;
         this.authenticityToken = authenticityToken;
         this.clientSecret = clientSecret;
@@ -44,7 +41,7 @@ public class FlutterConfirmPaymentParams {
         } else if ( savedCard != null) {
             return new SavedCard(savedCard.panToken, savedCard.cvv).toPaymentMethodParams();
         } else if (googlePayData != null) {
-            return new GooglePayPayment(GooglePayPayment.Provider.GOOGLE_PAY, googlePayData).toPaymentMethodParams();
+            return new GooglePayPayment(GooglePayPayment.Provider.GOOGLE_PAY).toPaymentMethodParams();
         } else {
             return new SavedCard(savedCard.panToken, savedCard.cvv).toPaymentMethodParams();
         }
@@ -83,6 +80,10 @@ public class FlutterConfirmPaymentParams {
         return MonriApiOptions.create(authenticityToken, developmentMode);
     }
 
+    public FlutterGooglePay getGooglePayData() {
+        return googlePayData;
+    }
+
     @SuppressWarnings("unchecked")
     private static FlutterCard card(Map<String, Object> cardMap) {
 
@@ -113,12 +114,37 @@ public class FlutterConfirmPaymentParams {
     }
 
     public static FlutterConfirmPaymentParams forGooglePay(Map<String, Object> map) {
-        return create(map, null, null, null);
+        final int gPayType;
+        final int gPayTheme;
+        final int gPayCornerRadius;
+
+        Object typeObj = map.get("gPayButtonType");
+        if (typeObj != null) {
+            gPayType = (int) typeObj;
+        } else {
+            gPayType = 1; // or some default value
+        }
+
+        Object themeObj = map.get("gPayButtonTheme");
+        if (typeObj != null) {
+            gPayTheme = (int) themeObj;
+        } else {
+            gPayTheme = 1; // or some default value
+        }
+
+        Object cornerRadiusObj = map.get("gPayCornerRadius");
+        if (typeObj != null) {
+            gPayCornerRadius = (int) cornerRadiusObj;
+        } else {
+            gPayCornerRadius = 100; // or some default value
+        }
+
+        return create(map, null, null, new FlutterGooglePay(gPayTheme, gPayType, gPayCornerRadius));
     }
 
     @SuppressWarnings("unchecked")
     private static FlutterConfirmPaymentParams create(Map<String, Object> request, FlutterCard card,
-            FlutterSavedCard savedCard, JSONObject googlePayData) {
+            FlutterSavedCard savedCard, FlutterGooglePay googlePayData) {
 
         String authenticityToken = (String) request.get("authenticity_token");
         String clientSecret = (String) request.get("client_secret");
@@ -200,6 +226,18 @@ public class FlutterConfirmPaymentParams {
         FlutterSavedCard(String panToken, String cvv) {
             this.panToken = panToken;
             this.cvv = cvv;
+        }
+    }
+
+    static class FlutterGooglePay {
+        int gPayTheme;
+        int gPayButtonType;
+        int gPayCornerRadius;
+
+        FlutterGooglePay(int gPayTheme, int gPayButtonType, int gPayCornerRadius) {
+            this.gPayTheme = gPayTheme;
+            this.gPayButtonType = gPayButtonType;
+            this.gPayCornerRadius = gPayCornerRadius;
         }
     }
 }

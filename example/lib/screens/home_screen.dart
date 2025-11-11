@@ -165,6 +165,10 @@ String _getGooglePayJsonData({
   required String clientSecret,
   required String cardholderName,
 }){
+
+  var type = GPayButtonType.subscribe.rawValue;
+  var theme = GPayButtonTheme.light.rawValue;
+
   return """
 {
   "is_development_mode": true,
