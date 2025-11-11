@@ -23,7 +23,7 @@ class MonriPaymentsTest extends MonriPayments {
   }
 
   @override
-  Future<PaymentResponse> confirmGooglePayPayment(CardConfirmPaymentParams params) async {
+  Future<PaymentResponse> confirmGooglePayPayment(GooglePayConfirmPaymentParams params) async {
     return PaymentResponse.fromJson(jsonDecode(_json3));
   }
 }

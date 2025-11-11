@@ -1,5 +1,7 @@
 package com.monri.flutter;
 
+import org.json.JSONObject;
+
 import java.util.Map;
 
 public class MonriConverter {
@@ -20,8 +22,10 @@ public class MonriConverter {
             flutterConfirmPaymentParams = FlutterConfirmPaymentParams.forCard(request);
         } else if (request.containsKey("saved_card")) {
             flutterConfirmPaymentParams = FlutterConfirmPaymentParams.forSavedCard(request);
+        } else if (request.containsKey("gPayButtonType") || request.containsKey("gPayButtonTheme") || request.containsKey("gPayCornerRadius")) {
+            flutterConfirmPaymentParams = FlutterConfirmPaymentParams.forGooglePay(request);
         } else {
-            throw new IllegalStateException("Unsupported payment method, 'card' or 'saved_card' not found");
+            throw new IllegalStateException("Unsupported payment method, 'card', 'saved_card' or 'googlepay' not found");
         }
 
         return flutterConfirmPaymentParams;

@@ -84,7 +84,27 @@ class Home extends StatelessWidget {
     );
   }
 
-  void payWithGooglePay() {
+  void payWithGooglePay() async {
+    Map data = {};
+    try {
+      var platform = MethodChannel('monri.create.payment.session.channel');
+      final monriPayments = MonriPayments.create();
+      var clientSecret = await platform.invokeMethod('monri.create.payment.session.method');
+
+      var arguments = jsonDecode(_getGooglePayJsonData(
+          clientSecret: clientSecret,
+          cardholderName: "Customer12"
+      ));
+      var result = await monriPayments.confirmGooglePayPayment(GooglePayConfirmPaymentParams.fromJSON(arguments));
+      data = result.toJson();
+      print(data);
+    } on PlatformException catch (e) {
+      data = {"status": "error", "message": e.message, "code": e.code};
+      print(data);
+    } catch (e) {
+      data = {"status": "error", "message": e.toString()};
+      print(data);
+    }
 
   }
 
@@ -95,7 +115,7 @@ class Home extends StatelessWidget {
       final monriPayments = MonriPayments.create();
       var clientSecret = await platform.invokeMethod('monri.create.payment.session.method');
 
-      var arguments = jsonDecode(_getJsonData(
+      var arguments = jsonDecode(_getApplePayJsonData(
           clientSecret: clientSecret,
           cardholderName: "Customer12",
           applePayMerchantID: "merchant.monri.example"
@@ -114,7 +134,7 @@ class Home extends StatelessWidget {
   }
 }
 
-String _getJsonData({
+String _getApplePayJsonData({
   required String clientSecret,
   required String cardholderName,
   required String applePayMerchantID
@@ -127,6 +147,34 @@ String _getJsonData({
   "pkPaymentButtonStyle":null,
   "pkPaymentButtonType":null,
   "client_secret": "$clientSecret",
+  "transaction_params": {
+      "full_name": "$cardholderName",
+      "address": "N/A",
+      "city": "Sarajevo",
+      "zip": "71000",
+      "phone": "N/A",
+      "country": "BA",
+      "email": "monri.flutter@gmail.com",
+      "custom_params": ""
+  }
+}
+""";
+}
+
+String _getGooglePayJsonData({
+  required String clientSecret,
+  required String cardholderName,
+}){
+
+  var type = GPayButtonType.subscribe.rawValue;
+  var theme = GPayButtonTheme.light.rawValue;
+
+  return """
+{
+  "is_development_mode": true,
+  "authenticity_token": "c6301017117302601b823874972a97acce96f2df",
+  "client_secret": "$clientSecret",
+  "googlePay": true,
   "transaction_params": {
       "full_name": "$cardholderName",
       "address": "N/A",
