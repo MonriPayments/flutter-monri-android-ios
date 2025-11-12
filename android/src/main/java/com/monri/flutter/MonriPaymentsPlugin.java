@@ -5,10 +5,10 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.monri.android.ActionResultConsumer;
+import com.monri.flutter.BuildConfig;
 import com.monri.android.Monri;
+import com.monri.android.googlepay.GooglePayButtonOptions;
 import com.monri.android.model.ConfirmPaymentParams;
-import com.monri.android.model.PaymentResult;
 
 import androidx.activity.result.ActivityResultCaller;
 import androidx.annotation.NonNull;
@@ -26,12 +26,14 @@ import io.flutter.plugin.common.MethodChannel.Result;
  * MonriPaymentsPlugin
  */
 public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
+
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private static final String CHANNEL = "MonriPayments";
     private static final String CONFIRM_PAYMENT = "confirmPayment";
+    private static final String CONFIRM_GOOGLE_PAY = "confirmGooglePayment";
     private MethodChannel channel;
     private Boolean devMode = true;
     private FlutterPluginBinding pluginBinding;
@@ -39,10 +41,11 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     private Application application;
     private Activity activity;
     private Monri monri;
+    private final PaymentResultMapper paymentResultMapper = new PaymentResultMapper();
 
     private void initMonri() {
         if (activity != null && monri == null) {
-            monri = new Monri((ActivityResultCaller)this.activity);
+            monri = new Monri((ActivityResultCaller) this.activity);
         }
     }
 
@@ -50,51 +53,58 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         if (CONFIRM_PAYMENT.equals(call.method)) {
             monriConfirmPayment(call.arguments, result);
+        } else if (CONFIRM_GOOGLE_PAY.equals(call.method)) {
+            confirmGooglePayPayment(call.arguments, result);
         } else {
             result.notImplemented();
         }
     }
 
-    private void monriConfirmPayment(Object arguments, MethodChannel.Result result) {
-        
-        FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
-        ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
+    private void monriConfirmPayment(final Object arguments, final MethodChannel.Result result) {
+
+        final FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
+        final ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
 
         MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
 
         monri.setMonriApiOptions(flutterConfirmPaymentParams.monriApiOptions());
 
-        this.monri.confirmPayment(confirmPaymentParams, new ActionResultConsumer<PaymentResult>() {
-            @Override
-            public void accept(PaymentResult paymentResult, Throwable throwable) {
-                if (throwable != null) {
-                    result.error("payment_error", throwable.getMessage(), null);
-                    return;
-                }
+        this.monri.confirmPayment(confirmPaymentParams, (paymentResult, throwable) -> {
+            if (throwable != null) {
+                result.error("payment_error", throwable.getMessage(), null);
+                return;
+            }
 
-                if (paymentResult != null) {
-                    java.util.Map<String, Object> response = new java.util.HashMap<>();
-                    java.util.Map<String, Object> data = new java.util.HashMap<>();
-                    final String status = paymentResult.getStatus();
-
-                    data.put("status", paymentResult.getStatus());
-                    data.put("amount", paymentResult.getAmount());
-                    data.put("orderNumber", paymentResult.getOrderNumber());
-                    data.put("transactionType", paymentResult.getTransactionType());
-                    data.put("pan_token", paymentResult.getPanToken());
-                    java.util.List<String> errors = paymentResult.getErrors();
-                    if (errors != null) {
-                        data.put("errors", errors);
-                    }
-                    data.put("createdAt", paymentResult.getCreatedAt());
-                    data.put("currency", paymentResult.getCurrency());
-
-                    response.put("status", status);
-                    response.put("data", data);
-                    result.success(response);
-                }
+            if (paymentResult != null) {
+                result.success(paymentResultMapper.mapPaymentResultToFlutterResult(paymentResult));
             }
         });
+    }
+
+    private void confirmGooglePayPayment(Object arguments, MethodChannel.Result result) {
+
+        final FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
+        final ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
+
+        MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
+
+        monri.setMonriApiOptions(flutterConfirmPaymentParams.monriApiOptions());
+
+        final FlutterConfirmPaymentParams.FlutterGooglePay gPayParams = flutterConfirmPaymentParams.getGooglePayData();
+
+        final GooglePayButtonOptions googlePayButtonOptions = new GooglePayButtonOptions(gPayParams.gPayButtonType, gPayParams.gPayTheme, gPayParams.gPayCornerRadius);
+
+        this.monri.confirmPayment(confirmPaymentParams, (paymentResult, throwable) -> {
+            if (throwable != null) {
+                result.error("payment_error", throwable.getMessage(), null);
+                return;
+            }
+
+            if(paymentResult != null) {
+                result.success(paymentResultMapper.mapPaymentResultToFlutterResult(paymentResult));
+            }
+
+        }, googlePayButtonOptions);
     }
 
     @Override
@@ -121,7 +131,7 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         channel = new MethodChannel(messenger, CHANNEL);
         channel.setMethodCallHandler(this);
 
-        initMonri();        
+        initMonri();
     }
 
     @Override

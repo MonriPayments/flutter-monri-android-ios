@@ -1,4 +1,5 @@
 import Flutter
+import PassKit
 import UIKit
 import Monri
 import WebKit
@@ -17,11 +18,13 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
         return UIApplication.shared.keyWindow!.rootViewController!
     }
     
-    var monri: MonriApi!;
+    var monri: MonriApi!
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch(call.method){
-        case "confirmPayment" : confirmPayment(call.arguments, result);
+            
+        case "confirmPayment" : confirmPayment(call.arguments, result)
+        case "confirmApplePayment": confirmPayment(call.arguments, result)
         default : result(FlutterMethodNotImplemented);
         }
     }
@@ -29,14 +32,16 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
     private func buildFlutterConfirmPaymentParams(_ arguments: Any?) throws -> FlutterConfirmPaymentParams  {
         let request = arguments as! Dictionary<String, AnyObject?>
         
-        print(request)
-        
         if let _ = request["card"] {
             return FlutterConfirmPaymentParams.forCard(request: request)
         }
         
         if let _ = request["saved_card"] {
             return FlutterConfirmPaymentParams.forSavedCard(request: request)
+        }
+        
+        if let _ = request["applePayMerchantID"] {
+            return FlutterConfirmPaymentParams.forApplePay(request: request)
         }
         
         throw ConfigurationError.unsupportedPaymentMethod
@@ -60,7 +65,9 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
             
             self.monri = MonriApi(rootViewController, options: monriOptions);
             
-            monri.confirmPayment(confirmPaymentParams, { [result] confirmPayment in
+            let customisation = getApplePayCustomisation(flutterApplePayment: params.flutterApplePayment)
+            
+            monri.confirmPayment(confirmPaymentParams, applePayCustomisation: customisation, { [result] confirmPayment in
                 switch confirmPayment {
                 case .result(let paymentResult):
                     result(["status" : "result", "data" : paymentResult.toJSON()]);
@@ -73,19 +80,31 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
                 case .pending:
                     result(["status" : "pending"]);
                 }
-            });
+            })
         } catch let error as ConfigurationError {
             result(["error" : "Unsupported payment method, 'card' or 'saved_card' not found", "status": "error"]);
         } catch let error {
             result(["error" : "An error occurred on confirmPayment - \(error)", "status": "error"]);
         }
     }
-
+    
     private func writeMetaData(){
         let version: String = Bundle(identifier: "org.cocoapods.MonriPayments")?.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
-
+        
         let defaults = UserDefaults.standard
         defaults.set("iOS-SDK:Flutter:\(version)", forKey: "com.monri.meta.library")
+    }
+    
+    private func getApplePayCustomisation(flutterApplePayment: FlutterApplePayment?) -> (PKPaymentButtonType, PKPaymentButtonStyle)? {
+        
+        guard let params = flutterApplePayment,
+              let style = params.pkPaymentButtonStyle,
+              let type = params.pkPaymentButtonType else {
+            return nil
+        }
+        
+        return (type, style)
+        
     }
 }
 
@@ -119,11 +138,11 @@ extension String {
 
 // Helper function to mask card PAN
 private func maskPan(_ pan: String) -> String {
-  if pan.count > 10 {
-    let prefix = pan.prefix(6)
-    let suffix = pan.suffix(4)
-    return "\(prefix)******\(suffix)"
-  } else {
-    return "********" // Too short to properly mask
-  }
+    if pan.count > 10 {
+        let prefix = pan.prefix(6)
+        let suffix = pan.suffix(4)
+        return "\(prefix)******\(suffix)"
+    } else {
+        return "********" // Too short to properly mask
+    }
 }

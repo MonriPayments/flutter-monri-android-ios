@@ -94,6 +94,19 @@ String _getJsonData({
 }
 ```
 
+## Apple Pay
+
+To use Apple Pay, required parameter is merchantID as well as setuping up profile to accept Apple Pay capability. 
+
+For more information on how to setup the XCode project, follow native guidelines: [Monri iOS Apple Pay Wiki](https://github.com/MonriPayments/monri-ios/wiki/Apple-Pay-configuration)
+To implement it in flutter, please refer to example project provided with the plugin.
+
+
+## Google Pay
+
+For more information on how to setup the Android project, follow native guidelines: [Monri Android Google Pay Wiki](https://github.com/MonriPayments/monri-android/wiki/Google-Pay-Integration)
+To implement it in flutter, please refer to example project provided with the plugin.
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.

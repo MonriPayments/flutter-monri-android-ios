@@ -7,14 +7,7 @@
 
 import Foundation
 import Monri
-//
-//  FlutterConfirmPaymentParams.swift
-//  MonriPayments
-//
-//  Created by Jasmin Suljic on 18/11/2020.
-//
-
-import Foundation
+import PassKit
 
 class FlutterConfirmPaymentParams {
     let developmentMode: Bool
@@ -23,18 +16,20 @@ class FlutterConfirmPaymentParams {
     let card: FlutterCard?
     let savedCard: FlutterSavedCard?
     let transactionParams: FlutterTransactionParams
+    let flutterApplePayment: FlutterApplePayment?
     
-    init(_ developmentMode: Bool,_ authenticityToken: String,_ clientSecret: String,_ card: FlutterCard?,_ savedCard: FlutterSavedCard?,_ transactionParams: FlutterTransactionParams) {
+    init(_ developmentMode: Bool,_ authenticityToken: String,_ clientSecret: String,_ card: FlutterCard?,_ savedCard: FlutterSavedCard?,_ transactionParams: FlutterTransactionParams, flutterApplePayment: FlutterApplePayment?) {
         self.developmentMode = developmentMode
         self.authenticityToken = authenticityToken
         self.clientSecret = clientSecret
         self.card = card
         self.savedCard = savedCard
         self.transactionParams = transactionParams
+        self.flutterApplePayment = flutterApplePayment
     }
     
-    func monriApiOptions() ->MonriApiOptions {
-        return MonriApiOptions(authenticityToken: authenticityToken, developmentMode: developmentMode)
+    func monriApiOptions() -> MonriApiOptions {
+        return MonriApiOptions(authenticityToken: authenticityToken, developmentMode: developmentMode, merchantID: flutterApplePayment?.merchantID)
     }
     
     private static func card(cardMap: Dictionary<String, AnyObject?>) -> FlutterCard {
@@ -47,6 +42,11 @@ class FlutterConfirmPaymentParams {
     }
     
     private func paymentMethodParams() -> PaymentMethodParams {
+        
+        if flutterApplePayment != nil {
+            return ApplePayPayment(paymentProvider: ApplePayPayment.Provider.APPLE_PAY).toPaymentMethodParams()
+        }
+        
         if let card = card {
             return Card(number: card.pan, cvc: card.cvv, expMonth: card.month, expYear: card.year, tokenizePan: card.tokenizePan).toPaymentMethodParams()
         }
@@ -92,6 +92,16 @@ class FlutterConfirmPaymentParams {
         let developmentMode: Bool = request["is_development_mode"] as! Bool
         let transactionParamsJSON: Dictionary<String, AnyObject?> = request["transaction_params"] as! Dictionary<String, AnyObject?>
         
+        let merchantID = request["applePayMerchantID"] as? String
+        let pkPaymentButtonType = request["pkPaymentButtonType"] as? Int
+        let pkPaymentButtonStyle = request["pkPaymentButtonStyle"] as? Int
+        
+        var flutterApplePayParams: FlutterApplePayment? = nil
+        
+        if card == nil && savedCard == nil {
+            flutterApplePayParams = FlutterApplePayment(merchantID, pkPaymentButtonStyle, pkPaymentButtonType)
+        }
+        
         let transactionParams: FlutterTransactionParams  = FlutterTransactionParams(
             orderInfo: transactionParamsJSON["order_info"] as? String,
             email: transactionParamsJSON["email"] as? String,
@@ -105,7 +115,7 @@ class FlutterConfirmPaymentParams {
             moto: transactionParamsJSON["moto"] as? Bool
         )
         
-        return FlutterConfirmPaymentParams(developmentMode, authenticityToken, clientSecret, card, savedCard, transactionParams)
+        return FlutterConfirmPaymentParams(developmentMode, authenticityToken, clientSecret, card, savedCard, transactionParams, flutterApplePayment: flutterApplePayParams)
     }
     
     static func forCard(request: Dictionary<String, AnyObject?>) -> FlutterConfirmPaymentParams {
@@ -119,6 +129,13 @@ class FlutterConfirmPaymentParams {
         return Self.create(request: request,
                            card: nil,
                            savedCard: Self.savedCard(cardMap: request["saved_card"] as! Dictionary<String, AnyObject?>)
+        )
+    }
+    
+    static func forApplePay(request: Dictionary<String, AnyObject?>) -> FlutterConfirmPaymentParams {
+        return Self.create(request: request,
+                           card: nil,
+                           savedCard: nil
         )
     }
 }
@@ -145,6 +162,18 @@ class FlutterSavedCard {
     init(_ panToken: String, _ cvv:String?) {
         self.panToken = panToken
         self.cvv = cvv
+    }
+}
+
+class FlutterApplePayment {
+    let merchantID: String?
+    let pkPaymentButtonStyle: PKPaymentButtonStyle?
+    let pkPaymentButtonType: PKPaymentButtonType?
+    
+    init(_ merchantID: String?, _ pkPaymentButtonStyleInt: Int?, _ pkPaymentButtonTypeInt: Int?) {
+        self.merchantID = merchantID
+        self.pkPaymentButtonStyle = PKPaymentButtonStyle(rawValue: pkPaymentButtonStyleInt ?? 2)
+        self.pkPaymentButtonType = PKPaymentButtonType(rawValue: pkPaymentButtonTypeInt ?? 0)
     }
 }
 
