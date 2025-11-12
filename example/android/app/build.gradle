@@ -28,7 +28,7 @@ if (flutterVersionName == null) {
 
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 36
 
     namespace "com.example.MonriPayments_example"
 

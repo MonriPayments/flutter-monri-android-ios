@@ -28,7 +28,7 @@ SPEC CHECKSUMS:
   Alamofire: 814429acc853c6c54ff123fc3d2ef66803823ce0
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   Monri: f5c2e6c6ea91e0fc108f270396904685a59f450b
-  MonriPayments: f54c95665b0a4c04328ac3281e6dc94a3b464b5a
+  MonriPayments: 8ee49667ba4eedb950b53838954c1b46086ffd99
 
 PODFILE CHECKSUM: bc5934dad08600dc891fc97ccfeae6eacfac67a8
 

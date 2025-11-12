@@ -5,7 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.monri.android.BuildConfig;
+import com.monri.flutter.BuildConfig;
 import com.monri.android.Monri;
 import com.monri.android.googlepay.GooglePayButtonOptions;
 import com.monri.android.model.ConfirmPaymentParams;

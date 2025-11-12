@@ -172,7 +172,7 @@ String _getGooglePayJsonData({
   return """
 {
   "is_development_mode": true,
-  "authenticity_token": "c6301017117302601b823874972a97acce96f2df",
+  "authenticity_token": "REPLACE_WITH_YOUR_AUTHENTICITY_TOKEN",
   "client_secret": "$clientSecret",
   "googlePay": true,
   "transaction_params": {
