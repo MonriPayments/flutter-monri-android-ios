@@ -107,6 +107,38 @@ To implement it in flutter, please refer to example project provided with the pl
 For more information on how to setup the Android project, follow native guidelines: [Monri Android Google Pay Wiki](https://github.com/MonriPayments/monri-android/wiki/Google-Pay-Integration)
 To implement it in flutter, please refer to example project provided with the plugin.
 
+## ScanDoc API
+
+This API allows for easy extraction of credit card details using a camera.
+
+First initialize the ScanDocApi:
+
+```dart
+MonriPayments monriPayments = MonriPayments.create();
+monriPayments.initScanDoc(ScanDocApiOptions(scanDocApiBaseUrl: 'REPLACE', userKey: 'REPLACE', subClient: 'REPLACE', acceptTermsAndConditions: true));
+```
+
+After initializing, you can call extractScannedCard, validation is not required. 
+
+```dart
+await monriPayments.extractScannedCard(imageBase64, null);
+```
+
+When sending configuration as null, default values will be used. Also, please beware that the required image format is Base64 String. 
+
+Scanning and extraction example is added to the example project in following screens:
+
+- photo_capture.dart
+- preview_screen.dart
+- extract_results.dart
+
+For further explanations on configuration and response data, please refer to native documentation:
+
+- [Android](https://github.com/MonriPayments/monri-android/wiki/ScanDoc-AI-Integration)
+
+- [iOS](https://github.com/MonriPayments/monri-ios/wiki/Scan-Doc-API)
+
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
