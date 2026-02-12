@@ -67,7 +67,7 @@ class PreviewScreen extends StatelessWidget {
               canStoreImages: false,
               dontUseValidation: true));
 
-      final response = await monriPayments.extractScannedCard(imageBase64, null);
+      final response = await monriPayments.extractScannedCard(imageBase64, extractionConfig);
 
       if (response != null) {
         Navigator.push(

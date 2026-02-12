@@ -6,12 +6,13 @@ class ScanDocValidationResponse {
   final List<String>? warnings;
   final int? status;
   final String? method;
-  final String? infoCode;
+  final int? infoCode;
   final double? analysisTime;
   final List<List<double>>? keypoints;
   final bool? validated;
   final int? index;
   final String? info;
+  final double? detectedBlurValue;
 
   ScanDocValidationResponse({
     this.transactionID,
@@ -27,6 +28,7 @@ class ScanDocValidationResponse {
     this.validated,
     this.index,
     this.info,
+    this.detectedBlurValue
   });
 
   factory ScanDocValidationResponse.fromJson(Map<String, dynamic> json) {
@@ -38,7 +40,7 @@ class ScanDocValidationResponse {
       warnings: (json['Warnings'] as List?)?.map((e) => e as String).toList(),
       status: json['Status'] as int?,
       method: json['Method'] as String?,
-      infoCode: json['InfoCode'] as String?,
+      infoCode: json['InfoCode'] as int?,
       analysisTime: (json['AnalysisTime'] as num?)?.toDouble(),
       keypoints: (json['Keypoints'] as List?)
           ?.map(
@@ -48,6 +50,7 @@ class ScanDocValidationResponse {
       validated: json['Validated'] as bool?,
       index: json['Index'] as int?,
       info: json['Info'] as String?,
+      detectedBlurValue: json['DetectedBlurValue'] as double?
     );
   }
 
@@ -66,6 +69,7 @@ class ScanDocValidationResponse {
       'validated': validated,
       'index': index,
       'info': info,
+      'detectedBlurValue': detectedBlurValue
     };
   }
 }
