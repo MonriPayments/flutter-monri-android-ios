@@ -19,12 +19,16 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
     }
     
     var monri: MonriApi!
+    var scanDocApi: ScanDocApi?
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch(call.method){
             
         case "confirmPayment" : confirmPayment(call.arguments, result)
         case "confirmApplePayment": confirmPayment(call.arguments, result)
+        case "initScanDoc": initScanDoc(args: call.arguments as! [String: Any], result: result)
+        case "extractScannedCard": extractScannedCard(args: call.arguments as! [String: Any], result: result)
+        case "validateScannedCard": validateScannedCard(args: call.arguments as! [String: Any], result: result)
         default : result(FlutterMethodNotImplemented);
         }
     }
@@ -82,9 +86,9 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
                 }
             })
         } catch let error as ConfigurationError {
-            result(["error" : "Unsupported payment method, 'card' or 'saved_card' not found", "status": "error"]);
+            result(["error" : "Unsupported payment method, 'card' or 'saved_card' not found", "status": "error"])
         } catch let error {
-            result(["error" : "An error occurred on confirmPayment - \(error)", "status": "error"]);
+            result(["error" : "An error occurred on confirmPayment - \(error)", "status": "error"])
         }
     }
     
@@ -106,13 +110,92 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
         return (type, style)
         
     }
+    
+    private func initScanDoc(args: [String: Any], result: @escaping FlutterResult) {
+        
+        guard let baseUrl = args["scanDocApiBaseUrl"] as? String,
+              let userKey = args["scanDocUserKey"] as? String,
+              let subClient = args["scanDocSubKey"] as? String,
+              let acceptTermsAndConditions = args["acceptTermsAndConditions"] as? Bool else {
+            result(["error" : "Unable to parse arguments for ScanDocApiOptions", "status": "error"])
+            return
+        }
+        
+        self.scanDocApi = ScanDocApi(options: ScanDocApiOptions(scanDocApiBaseUrl: baseUrl,
+                                                                userKey: userKey,
+                                                                subClient: subClient,
+                                                                acceptTermsAndConditions: acceptTermsAndConditions))
+        
+        result(nil)
+        
+    }
+    
+    private func extractScannedCard(args: [String: Any], result: @escaping FlutterResult) {
+        guard let base64 = args["base64Img"] as? String,
+              let imageData = Data(base64Encoded: base64),
+              let uiImage = UIImage(data: imageData) else {
+            result(FlutterError(code: "INVALID_IMAGE", message: "Base64 image is invalid", details: nil))
+            return
+        }
+        
+        var config: ExtractionConfiguration? = nil
+        if let configDict = args["configuration"] as? [String: Any] {
+            config = ExtractionConfiguration.fromJson(json: configDict)
+        }
+        
+        guard let scanDocApi = scanDocApi else {
+            result(FlutterError(code: "NOT_INITIALIZED", message: "Scan Doc is not initialized", details: nil))
+            return
+        }
+        
+        scanDocApi.extractDataFromScannedCard(scannedCardImage: uiImage, extractionConfiguration: config) { res in
+            switch res {
+            case .success(let response):
+                result(response.toJson())
+            case .failure(let error):
+                result(FlutterError(code: "EXTRACTION_FAILED", message: error.localizedDescription, details: nil))
+            }
+        }
+    }
+    
+    private func validateScannedCard(args: [String: Any], result: @escaping FlutterResult) {
+        guard let base64Array = args["base64Imgs"] as? [String] else {
+            result(FlutterError(code: "INVALID_IMAGES", message: "Base64 images array is missing", details: nil))
+            return
+        }
+        
+        let images: [UIImage] = base64Array.compactMap { str in
+            if let data = Data(base64Encoded: str) {
+                return UIImage(data: data)
+            }
+            return nil
+        }
+        
+        var config: ValidationConfiguration? = nil
+        if let configDict = args["configuration"] as? [String: Any] {
+            config = ValidationConfiguration.fromJson(json: configDict)
+        }
+        
+        guard let scanDocApi = scanDocApi else {
+            result(FlutterError(code: "NOT_INITIALIZED", message: "Scan Doc is not initialized", details: nil))
+            return
+        }
+        
+        scanDocApi.validateScannedCard(scannedCardImages: images, validationConfiguration: config) { res in
+            switch res {
+            case .success(let response):
+                result(response.toJson())
+            case .failure(let error):
+                result(FlutterError(code: "VALIDATION_FAILED", message: error.localizedDescription, details: nil))
+            }
+        }
+    }
+    
 }
-
 
 enum ConfigurationError: Error {
     case unsupportedPaymentMethod
 }
-
 
 extension String {
     func index(from: Int) -> Index {
