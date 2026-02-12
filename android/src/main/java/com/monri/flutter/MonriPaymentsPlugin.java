@@ -17,7 +17,6 @@ import com.monri.android.ExtractionConfiguration;
 import com.monri.android.ResultCallback;
 import com.monri.android.ValidationConfiguration;
 import com.monri.android.model.ExtractionResponse;
-import com.monri.android.model.ScanDocApiOptions;
 import com.monri.android.model.ValidationResponse;
 import com.monri.android.Monri;
 import com.monri.android.googlepay.GooglePayButtonOptions;
@@ -51,11 +50,32 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private static final String CHANNEL = "MonriPayments";
+
+    //Const methods
     private static final String CONFIRM_PAYMENT = "confirmPayment";
     private static final String CONFIRM_GOOGLE_PAY = "confirmGooglePayment";
     private static final String INIT_SCAN_DOC = "initScanDoc";
     private static final String EXTRACT_SCANNED_CARD = "extractScannedCard";
     private static final String VALIDATE_SCANNED_CARD = "validateScannedCard";
+
+    // Argument keys
+    private static final String KEY_BASE64_IMG = "base64Img";
+    private static final String KEY_BASE64_IMGS = "base64Imgs";
+    private static final String KEY_CONFIGURATION = "configuration";
+
+    // Error codes
+    private static final String ERROR_INVALID_ARGS = "INVALID_ARGS";
+    private static final String ERROR_INVALID_IMAGE = "INVALID_IMAGE";
+    private static final String ERROR_INVALID_IMAGES = "INVALID_IMAGES";
+    private static final String ERROR_EXTRACTION = "EXTRACTION_ERROR";
+    private static final String ERROR_VALIDATION = "VALIDATION_ERROR";
+
+    // Error messages
+    private static final String MSG_ARGS_MUST_BE_MAP = "Arguments must be a map";
+    private static final String MSG_MISSING_BASE64_IMG = "Missing base64Img";
+    private static final String MSG_MISSING_BASE64_IMGS = "Missing base64Imgs";
+    private static final String MSG_FAILED_DECODE_BITMAP = "Failed to decode base64 to bitmap";
+
     private MethodChannel channel;
     private Boolean devMode = true;
     private FlutterPluginBinding pluginBinding;
@@ -202,102 +222,98 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
 
     private Bitmap base64ToBitmap(String base64) {
-        byte[] decoded = android.util.Base64.decode(base64, android.util.Base64.DEFAULT);
+        final byte[] decoded = android.util.Base64.decode(base64, android.util.Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
     }
 
     private void initScanDoc(Object arguments, Result result) {
         if (!(arguments instanceof Map)) {
-            result.error("INVALID_ARGS", "Arguments must be a map", null);
+            result.error(ERROR_INVALID_ARGS, MSG_ARGS_MUST_BE_MAP, null);
             return;
         }
 
-        Map<String, Object> args = (Map<String, Object>) arguments;
+        scanDocApi = new ScanDocApi(scanDocApiOptionsFromJson((Map<String, Object>) arguments));
 
-        ScanDocApiOptions options = scanDocApiOptionsFromJson(args);
-
-        scanDocApi = new ScanDocApi(options);
         result.success(null);
     }
 
     private void extractScannedCard(Object arguments, Result result) {
 
         if (!(arguments instanceof Map)) {
-            result.error("INVALID_ARGS", "Arguments must be a map", null);
+            result.error(ERROR_INVALID_ARGS, MSG_ARGS_MUST_BE_MAP, null);
             return;
         }
 
-        Map<String, Object> args = (Map<String, Object>) arguments;
+        final Map<String, Object> args = (Map<String, Object>) arguments;
 
-        String base64 = (String) args.get("base64Img");
+        final String base64 = (String) args.get(KEY_BASE64_IMG);
+
         if (base64 == null) {
-            result.error("INVALID_IMAGE", "Missing base64Img", null);
+            result.error(ERROR_INVALID_IMAGE, MSG_MISSING_BASE64_IMG, null);
             return;
         }
 
-        Bitmap bitmap = base64ToBitmap(base64);
+        final Bitmap bitmap = base64ToBitmap(base64);
 
-        ExtractionConfiguration config = null;
-        if (args.containsKey("configuration") && args.get("configuration") instanceof Map) {
-            config = extractionConfigurationFromJson(
-                    (Map<String, Object>) args.get("configuration")
-            );
+        if (bitmap == null) {
+            result.error(ERROR_INVALID_IMAGE, MSG_FAILED_DECODE_BITMAP, null);
+            return;
         }
 
-        if (config != null) {
-            scanDocApi.extractDataFromScannedCard(bitmap, config, new ResultCallback<ExtractionResponse>() {
-                @Override
-                public void onSuccess(ExtractionResponse response) {
-                    result.success(extractionResponseToJson(response));
-                }
+        final ResultCallback<ExtractionResponse> callback = new ResultCallback<ExtractionResponse>() {
+            @Override
+            public void onSuccess(ExtractionResponse response) {
+                result.success(extractionResponseToJson(response));
+            }
 
-                @Override
-                public void onError(Throwable error) {
-                    result.error("EXTRACTION_ERROR", error.getMessage(), null);
-                }
-            });
+            @Override
+            public void onError(Throwable error) {
+                result.error(ERROR_EXTRACTION, error.getMessage(), null);
+            }
+        };
+
+        Object configuration = args.get(KEY_CONFIGURATION);
+        if (configuration instanceof Map) {
+            final ExtractionConfiguration config =
+                    extractionConfigurationFromJson((Map<String, Object>) configuration);
+
+            scanDocApi.extractDataFromScannedCard(bitmap, config, callback);
         } else {
-            scanDocApi.extractDataFromScannedCard(bitmap, new ResultCallback<ExtractionResponse>() {
-                @Override
-                public void onSuccess(ExtractionResponse response) {
-                    result.success(extractionResponseToJson(response));
-                }
-
-                @Override
-                public void onError(Throwable error) {
-                    result.error("EXTRACTION_ERROR", error.getMessage(), null);
-                }
-            });
+            scanDocApi.extractDataFromScannedCard(bitmap, callback);
         }
     }
 
     private void validateScannedCard(Object arguments, Result result) {
 
         if (!(arguments instanceof Map)) {
-            result.error("INVALID_ARGS", "Arguments must be a map", null);
+            result.error(ERROR_INVALID_ARGS, MSG_ARGS_MUST_BE_MAP, null);
             return;
         }
 
-        Map<String, Object> args = (Map<String, Object>) arguments;
+        final Map<String, Object> args = (Map<String, Object>) arguments;
 
-        List<String> base64Images = (List<String>) args.get("base64Imgs");
+        final List<String> base64Images = (List<String>) args.get(KEY_BASE64_IMGS);
         if (base64Images == null || base64Images.isEmpty()) {
-            result.error("INVALID_IMAGES", "Missing base64Imgs", null);
+            result.error(ERROR_INVALID_IMAGES, MSG_MISSING_BASE64_IMGS, null);
             return;
         }
 
-        List<Bitmap> bitmapList = new ArrayList<>();
-        for (String img : base64Images) {
+        final List<Bitmap> bitmapList = new ArrayList<>();
+        for (final String img : base64Images) {
             bitmapList.add(base64ToBitmap(img));
         }
 
-        Bitmap[] bitmaps = bitmapList.toArray(new Bitmap[0]);
+        final Bitmap[] bitmaps = bitmapList.toArray(new Bitmap[0]);
 
-        ValidationConfiguration config = new ValidationConfiguration();
-        if (args.containsKey("configuration") && args.get("configuration") instanceof Map) {
+        final ValidationConfiguration config;
+
+        Object configuration = args.get(KEY_CONFIGURATION);
+        if (configuration instanceof Map) {
             config = validationConfigurationFromJson(
-                    (Map<String, Object>) args.get("configuration")
+                    (Map<String, Object>) configuration
             );
+        } else {
+            config = new ValidationConfiguration();
         }
 
         scanDocApi.validateScannedCard(bitmaps, config, new ResultCallback<ValidationResponse>() {
@@ -308,11 +324,9 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
             @Override
             public void onError(Throwable error) {
-                result.error("EXTRACTION_ERROR", error.getMessage(), null);
+                result.error(ERROR_VALIDATION, error.getMessage(), null);
             }
         });
-
     }
-
 
 }

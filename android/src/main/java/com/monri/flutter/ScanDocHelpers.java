@@ -15,91 +15,138 @@ import java.util.Map;
 
 class ScanDocHelpers {
 
+    private static final String KEY_SCAN_DOC_API_BASE_URL = "scanDocApiBaseUrl";
+    private static final String KEY_SCAN_DOC_USER_KEY = "scanDocUserKey";
+    private static final String KEY_SCAN_DOC_SUB_KEY = "scanDocSubKey";
+    private static final String KEY_ACCEPT_TERMS = "acceptTermsAndConditions";
+
+    private static final String KEY_BLUR_VALUES = "blurValues";
+    private static final String KEY_VALIDATION_SETTINGS = "validationSettings";
+    private static final String KEY_SKIP_IMAGE_SIZE_CHECK = "skipImageSizeCheck";
+
+    private static final String KEY_IMAGE_CONFIGURATION = "imageConfiguration";
+    private static final String KEY_IMAGE_CROPPED = "imageCropped";
+
+    private static final String KEY_EXTRACTION_CONFIGURATION_SETTINGS = "extractionConfigurationSettings";
+    private static final String KEY_SHOULD_RETURN_DOCUMENT_IMAGE = "shouldReturnDocumentImage";
+    private static final String KEY_SKIP_DOCUMENT_SIZE_CHECK = "skipDocumentSizeCheck";
+    private static final String KEY_CAN_STORE_IMAGES = "canStoreImages";
+    private static final String KEY_DONT_USE_VALIDATION = "dontUseValidation";
+
+    private static final String KEY_TRANSACTION_ID = "TransactionID";
+    private static final String KEY_UPLOADED_AT = "UploadedAt";
+    private static final String KEY_PRODUCT_NAME = "ProductName";
+    private static final String KEY_ERRORS = "Errors";
+    private static final String KEY_WARNINGS = "Warnings";
+    private static final String KEY_STATUS = "Status";
+    private static final String KEY_METHOD = "Method";
+    private static final String KEY_INFO_CODE = "InfoCode";
+    private static final String KEY_ANALYSIS_TIME = "AnalysisTime";
+    private static final String KEY_VALIDATED = "Validated";
+    private static final String KEY_KEYPOINTS = "Keypoints";
+    private static final String KEY_DETECTED_BLUR_VALUE = "DetectedBlurValue";
+    private static final String KEY_INDEX = "Index";
+    private static final String KEY_INFO = "Info";
+
+    private static final String KEY_OS = "OS";
+    private static final String KEY_BROWSER = "Browser";
+    private static final String KEY_DEVICE = "Device";
+
+    private static final String KEY_DATA = "Data";
+    private static final String KEY_HOLDERS_NAME = "HoldersName";
+    private static final String KEY_LUHN_CHECK = "LuhnCheck";
+    private static final String KEY_CARD_NUMBER = "CardNumber";
+    private static final String KEY_EXPIRY_DATE = "ExpiryDate";
+    private static final String KEY_EXTRACTED_TEXTS = "ExtractedTexts";
+    private static final String KEY_IBAN = "IBAN";
+    private static final String KEY_ISSUED_DATE = "IssuedDate";
+
+    private static final String KEY_IMAGE_DATA = "ImageData";
+    private static final String KEY_CREDIT_CARD_IMAGE = "CreditCardImage";
+
     static ScanDocApiOptions scanDocApiOptionsFromJson(Map<String, Object> json) {
         return new ScanDocApiOptions(
-                (String) json.get("scanDocApiBaseUrl"),
-                (String) json.get("scanDocUserKey"),
-                (String) json.get("scanDocSubKey"),
-                (boolean) json.get("acceptTermsAndConditions")
+                (String) json.get(KEY_SCAN_DOC_API_BASE_URL),
+                (String) json.get(KEY_SCAN_DOC_USER_KEY),
+                (String) json.get(KEY_SCAN_DOC_SUB_KEY),
+                (boolean) json.get(KEY_ACCEPT_TERMS)
         );
     }
 
     static ValidationConfiguration validationConfigurationFromJson(Map<String, Object> json) {
         if (json == null) return null;
 
-        List<Double> blurValues = (List<Double>) json.get("blurValues");
+        final List<Double> blurValues = (List<Double>) json.get(KEY_BLUR_VALUES);
 
-        Map<String, Object> settingsMap =
-                (Map<String, Object>) json.get("validationSettings");
+        final Map<String, Object> settingsMap =
+                (Map<String, Object>) json.get(KEY_VALIDATION_SETTINGS);
 
-        Boolean skipImageSizeCheck =
-                (Boolean) settingsMap.get("skipImageSizeCheck");
+        final Boolean skipImageSizeCheck =
+                (Boolean) settingsMap.get(KEY_SKIP_IMAGE_SIZE_CHECK);
 
-        ValidationSettings settings = new ValidationSettings(skipImageSizeCheck);
+        final ValidationSettings settings = new ValidationSettings(skipImageSizeCheck);
 
         return new ValidationConfiguration(settings, blurValues);
     }
 
     static Map<String, Object> validationResponseToJson(ValidationResponse response) {
-        Map<String, Object> json = new HashMap<>();
+        final Map<String, Object> json = new HashMap<>();
 
-        json.put("TransactionID", response.getTransactionID());
-        json.put("UploadedAt", response.getUploadedAt());
-        json.put("ProductName", response.getProductName());
-        json.put("Errors", response.getErrors());
-        json.put("Warnings", response.getWarnings());
-        json.put("Status", response.getStatus());
-        json.put("Method", response.getMethod());
-        json.put("InfoCode", response.getInfoCode());
-        json.put("AnalysisTime", response.getAnalysisTime());
-        json.put("Validated", response.isValidated());
-        json.put("Keypoints", response.getKeypoints());
-        json.put("DetectedBlurValue", response.getDetectedBlurValue());
-        json.put("Index", response.getIndex());
-        json.put("Info", response.getInfo());
+        json.put(KEY_TRANSACTION_ID, response.getTransactionID());
+        json.put(KEY_UPLOADED_AT, response.getUploadedAt());
+        json.put(KEY_PRODUCT_NAME, response.getProductName());
+        json.put(KEY_ERRORS, response.getErrors());
+        json.put(KEY_WARNINGS, response.getWarnings());
+        json.put(KEY_STATUS, response.getStatus());
+        json.put(KEY_METHOD, response.getMethod());
+        json.put(KEY_INFO_CODE, response.getInfoCode());
+        json.put(KEY_ANALYSIS_TIME, response.getAnalysisTime());
+        json.put(KEY_VALIDATED, response.isValidated());
+        json.put(KEY_KEYPOINTS, response.getKeypoints());
+        json.put(KEY_DETECTED_BLUR_VALUE, response.getDetectedBlurValue());
+        json.put(KEY_INDEX, response.getIndex());
+        json.put(KEY_INFO, response.getInfo());
 
         return json;
     }
 
-
     static Map<String, Object> extractionResponseToJson(ExtractionResponse response) {
-        Map<String, Object> json = new HashMap<>();
+        final Map<String, Object> json = new HashMap<>();
 
-        json.put("TransactionID", response.getTransactionID());
-        json.put("UploadedAt", response.getUploadedAt());
-        json.put("ProductName", response.getProductName());
-        json.put("Errors", response.getErrors());
-        json.put("Warnings", response.getWarnings());
-        json.put("Status", response.getStatus());
-        json.put("Method", response.getMethod());
-        json.put("InfoCode", response.getInfoCode());
-        json.put("AnalysisTime", response.getAnalysisTime());
-        json.put("OS", response.getOsInfo());
-        json.put("Browser", response.getBrowserInfo());
-        json.put("Device", response.getDeviceInfo());
+        json.put(KEY_TRANSACTION_ID, response.getTransactionID());
+        json.put(KEY_UPLOADED_AT, response.getUploadedAt());
+        json.put(KEY_PRODUCT_NAME, response.getProductName());
+        json.put(KEY_ERRORS, response.getErrors());
+        json.put(KEY_WARNINGS, response.getWarnings());
+        json.put(KEY_STATUS, response.getStatus());
+        json.put(KEY_METHOD, response.getMethod());
+        json.put(KEY_INFO_CODE, response.getInfoCode());
+        json.put(KEY_ANALYSIS_TIME, response.getAnalysisTime());
+        json.put(KEY_OS, response.getOsInfo());
+        json.put(KEY_BROWSER, response.getBrowserInfo());
+        json.put(KEY_DEVICE, response.getDeviceInfo());
 
         if (response.getCardData() != null) {
-            Map<String, Object> data = new HashMap<>();
+            final Map<String, Object> data = new HashMap<>();
+            data.put(KEY_HOLDERS_NAME, response.getCardData().getHoldersName());
+            data.put(KEY_LUHN_CHECK, response.getCardData().getLuhnCheck());
+            data.put(KEY_CARD_NUMBER, response.getCardData().getCardNumber());
+            data.put(KEY_EXPIRY_DATE, response.getCardData().getExpiryDate());
+            data.put(KEY_EXTRACTED_TEXTS, response.getCardData().getExtractedTexts());
+            data.put(KEY_IBAN, response.getCardData().getIBAN());
+            data.put(KEY_ISSUED_DATE, response.getCardData().getIssuedDate());
 
-            data.put("HoldersName", response.getCardData().getHoldersName());
-            data.put("LuhnCheck", response.getCardData().getLuhnCheck());
-            data.put("CardNumber", response.getCardData().getCardNumber());
-            data.put("ExpiryDate", response.getCardData().getExpiryDate());
-            data.put("ExtractedTexts", response.getCardData().getExtractedTexts());
-            data.put("IBAN", response.getCardData().getIBAN());
-            data.put("IssuedDate", response.getCardData().getIssuedDate());
-
-            json.put("Data", data);
+            json.put(KEY_DATA, data);
         } else {
-            json.put("Data", null);
+            json.put(KEY_DATA, null);
         }
 
         if (response.getBase64CreditCardImage() != null) {
-            Map<String, Object> imageData = new HashMap<>();
-            imageData.put("CreditCardImage", response.getBase64CreditCardImage());
-            json.put("ImageData", imageData);
+            final Map<String, Object> imageData = new HashMap<>();
+            imageData.put(KEY_CREDIT_CARD_IMAGE, response.getBase64CreditCardImage());
+            json.put(KEY_IMAGE_DATA, imageData);
         } else {
-            json.put("ImageData", null);
+            json.put(KEY_IMAGE_DATA, null);
         }
 
         return json;
@@ -108,35 +155,36 @@ class ScanDocHelpers {
     static ExtractionConfiguration extractionConfigurationFromJson(Map<String, Object> json) {
         if (json == null) return null;
 
-        Map<String, Object> imageConfigMap =
-                (Map<String, Object>) json.get("imageConfiguration");
+        final Map<String, Object> imageConfigMap =
+                (Map<String, Object>) json.get(KEY_IMAGE_CONFIGURATION);
 
         assert imageConfigMap != null;
-        Boolean imageCropped = (Boolean) imageConfigMap.get("imageCropped");
+        final Boolean imageCropped = (Boolean) imageConfigMap.get(KEY_IMAGE_CROPPED);
 
-        ImageConfiguration imageConfiguration =
+        final ImageConfiguration imageConfiguration =
                 new ImageConfiguration(ExtractionConfiguration.ImageType.BASE64, Boolean.TRUE.equals(imageCropped));
 
-        Map<String, Object> settingsMap =
-                (Map<String, Object>) json.get("extractionConfigurationSettings");
+        final Map<String, Object> settingsMap =
+                (Map<String, Object>) json.get(KEY_EXTRACTION_CONFIGURATION_SETTINGS);
 
-        Boolean shouldReturnDocumentImage =
-                (Boolean) settingsMap.get("shouldReturnDocumentImage");
-        Boolean skipDocumentSizeCheck =
-                (Boolean) settingsMap.get("skipDocumentSizeCheck");
-        Boolean skipImageSizeCheck =
-                (Boolean) settingsMap.get("skipImageSizeCheck");
-        Boolean canStoreImages =
-                (Boolean) settingsMap.get("canStoreImages");
-        Boolean dontUseValidation =
-                (Boolean) settingsMap.get("dontUseValidation");
+        final Boolean shouldReturnDocumentImage =
+                (Boolean) settingsMap.get(KEY_SHOULD_RETURN_DOCUMENT_IMAGE);
+        final Boolean skipDocumentSizeCheck =
+                (Boolean) settingsMap.get(KEY_SKIP_DOCUMENT_SIZE_CHECK);
+        final Boolean skipImageSizeCheck =
+                (Boolean) settingsMap.get(KEY_SKIP_IMAGE_SIZE_CHECK);
+        final Boolean canStoreImages =
+                (Boolean) settingsMap.get(KEY_CAN_STORE_IMAGES);
+        final Boolean dontUseValidation =
+                (Boolean) settingsMap.get(KEY_DONT_USE_VALIDATION);
 
-        ExtractionSettings settings = new ExtractionSettings.Builder()
-                .setCanStoreImages(canStoreImages != null && canStoreImages)
-                .setShouldReturnDocumentImage(shouldReturnDocumentImage != null && shouldReturnDocumentImage)
-                .setDontUseValidation(dontUseValidation != null && dontUseValidation)
-                .setSkipDocumentSizeCheck(skipDocumentSizeCheck != null && skipDocumentSizeCheck)
-                .setSkipImageSizeCheck(skipImageSizeCheck != null && skipImageSizeCheck).build();
+        final ExtractionSettings settings = new ExtractionSettings.Builder()
+                .setCanStoreImages(Boolean.TRUE.equals(canStoreImages))
+                .setShouldReturnDocumentImage(Boolean.TRUE.equals(shouldReturnDocumentImage))
+                .setDontUseValidation(Boolean.TRUE.equals(dontUseValidation))
+                .setSkipDocumentSizeCheck(Boolean.TRUE.equals(skipDocumentSizeCheck))
+                .setSkipImageSizeCheck(Boolean.TRUE.equals(skipImageSizeCheck))
+                .build();
 
         return new ExtractionConfiguration(imageConfiguration, settings);
     }
