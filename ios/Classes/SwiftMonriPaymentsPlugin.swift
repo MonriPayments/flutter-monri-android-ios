@@ -8,7 +8,10 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
     public static var _registrar: FlutterPluginRegistrar!
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "MonriPayments", binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(
+            name: PluginKeys.channelName,
+            binaryMessenger: registrar.messenger()
+        )
         let instance = SwiftMonriPaymentsPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
         _registrar = registrar;
@@ -22,29 +25,40 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
     var scanDocApi: ScanDocApi?
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        switch(call.method){
+        switch(call.method) {
             
-        case "confirmPayment" : confirmPayment(call.arguments, result)
-        case "confirmApplePayment": confirmPayment(call.arguments, result)
-        case "initScanDoc": initScanDoc(args: call.arguments as! [String: Any], result: result)
-        case "extractScannedCard": extractScannedCard(args: call.arguments as! [String: Any], result: result)
-        case "validateScannedCard": validateScannedCard(args: call.arguments as! [String: Any], result: result)
-        default : result(FlutterMethodNotImplemented);
+        case PluginKeys.confirmPayment:
+            confirmPayment(call.arguments, result)
+            
+        case PluginKeys.confirmApplePayment:
+            confirmPayment(call.arguments, result)
+            
+        case PluginKeys.initScanDoc:
+            initScanDoc(args: call.arguments as! [String: Any], result: result)
+            
+        case PluginKeys.extractScannedCard:
+            extractScannedCard(args: call.arguments as! [String: Any], result: result)
+            
+        case PluginKeys.validateScannedCard:
+            validateScannedCard(args: call.arguments as! [String: Any], result: result)
+            
+        default:
+            result(FlutterMethodNotImplemented)
         }
     }
     
     private func buildFlutterConfirmPaymentParams(_ arguments: Any?) throws -> FlutterConfirmPaymentParams  {
         let request = arguments as! Dictionary<String, AnyObject?>
         
-        if let _ = request["card"] {
+        if let _ = request[PluginKeys.card] {
             return FlutterConfirmPaymentParams.forCard(request: request)
         }
         
-        if let _ = request["saved_card"] {
+        if let _ = request[PluginKeys.savedCard] {
             return FlutterConfirmPaymentParams.forSavedCard(request: request)
         }
         
-        if let _ = request["applePayMerchantID"] {
+        if let _ = request[PluginKeys.applePayMerchantID] {
             return FlutterConfirmPaymentParams.forApplePay(request: request)
         }
         
@@ -74,29 +88,36 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
             monri.confirmPayment(confirmPaymentParams, applePayCustomisation: customisation, { [result] confirmPayment in
                 switch confirmPayment {
                 case .result(let paymentResult):
-                    result(["status" : "result", "data" : paymentResult.toJSON()]);
+                    result([PluginKeys.status : PluginKeys.statusResult,
+                            PluginKeys.data : paymentResult.toJSON()])
                 case .declined(let confirmPaymentDeclined):
-                    result(["status" : "declined", "data" : confirmPaymentDeclined.status]);
+                    result([PluginKeys.status : PluginKeys.statusDeclined,
+                            PluginKeys.data : confirmPaymentDeclined.status])
                 case .error(let error):
                     if let nsError = error as NSError? {
                     }
-                    result(["status" : "error", "data": ["error": error.localizedDescription]]);
+                    result([PluginKeys.status : PluginKeys.statusError,
+                            PluginKeys.data : [PluginKeys.error : error.localizedDescription]])
                 case .pending:
-                    result(["status" : "pending"]);
+                    result([PluginKeys.status : PluginKeys.statusPending])
                 }
             })
         } catch let error as ConfigurationError {
-            result(["error" : "Unsupported payment method, 'card' or 'saved_card' not found", "status": "error"])
+            result([PluginKeys.error :
+                        "Unsupported payment method, 'card' or 'saved_card' not found",
+                    PluginKeys.status: PluginKeys.statusError])
         } catch let error {
-            result(["error" : "An error occurred on confirmPayment - \(error)", "status": "error"])
+            result([PluginKeys.error :
+                        "An error occurred on confirmPayment - \(error)",
+                    PluginKeys.status: PluginKeys.statusError])
         }
     }
     
-    private func writeMetaData(){
-        let version: String = Bundle(identifier: "org.cocoapods.MonriPayments")?.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+    private func writeMetaData() {
+        let version: String = Bundle(identifier: PluginKeys.monriBundleId)?.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         
         let defaults = UserDefaults.standard
-        defaults.set("iOS-SDK:Flutter:\(version)", forKey: "com.monri.meta.library")
+        defaults.set("iOS-SDK:Flutter:\(version)", forKey: PluginKeys.monriMetaLibrary)
     }
     
     private func getApplePayCustomisation(flutterApplePayment: FlutterApplePayment?) -> (PKPaymentButtonType, PKPaymentButtonStyle)? {
@@ -113,11 +134,15 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
     
     private func initScanDoc(args: [String: Any], result: @escaping FlutterResult) {
         
-        guard let baseUrl = args["scanDocApiBaseUrl"] as? String,
-              let userKey = args["scanDocUserKey"] as? String,
-              let subClient = args["scanDocSubKey"] as? String,
-              let acceptTermsAndConditions = args["acceptTermsAndConditions"] as? Bool else {
-            result(["error" : "Unable to parse arguments for ScanDocApiOptions", "status": "error"])
+        guard let baseUrl = args[PluginKeys.scanDocApiBaseUrl] as? String,
+              let userKey = args[PluginKeys.scanDocUserKey] as? String,
+              let subClient = args[PluginKeys.scanDocSubKey] as? String,
+              let acceptTermsAndConditions =
+                args[PluginKeys.acceptTermsAndConditions] as? Bool
+        else {
+            result([PluginKeys.error :
+                        PluginKeys.invalidArgumentsMessage,
+                    PluginKeys.status: PluginKeys.statusError])
             return
         }
         
@@ -131,20 +156,27 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
     }
     
     private func extractScannedCard(args: [String: Any], result: @escaping FlutterResult) {
-        guard let base64 = args["base64Img"] as? String,
+        guard let base64 = args[PluginKeys.base64Img] as? String,
               let imageData = Data(base64Encoded: base64),
               let uiImage = UIImage(data: imageData) else {
-            result(FlutterError(code: "INVALID_IMAGE", message: "Base64 image is invalid", details: nil))
+            result(FlutterError(
+                code: PluginKeys.invalidImage,
+                message: PluginKeys.invalidImageMessage,
+                details: nil))
             return
         }
-        
+
         var config: ExtractionConfiguration? = nil
-        if let configDict = args["configuration"] as? [String: Any] {
+        
+        if let configDict = args[PluginKeys.configuration] as? [String: Any] {
             config = ExtractionConfiguration.fromJson(json: configDict)
         }
-        
+
         guard let scanDocApi = scanDocApi else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "Scan Doc is not initialized", details: nil))
+            result(FlutterError(
+                code: PluginKeys.notInitialized,
+                message: PluginKeys.notInitialized,
+                details: nil))
             return
         }
         
@@ -153,17 +185,21 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
             case .success(let response):
                 result(response.toJson())
             case .failure(let error):
-                result(FlutterError(code: "EXTRACTION_FAILED", message: error.localizedDescription, details: nil))
+                result(FlutterError(code: PluginKeys.extractionFailed, message: error.localizedDescription, details: nil))
             }
         }
     }
     
     private func validateScannedCard(args: [String: Any], result: @escaping FlutterResult) {
-        guard let base64Array = args["base64Imgs"] as? [String] else {
-            result(FlutterError(code: "INVALID_IMAGES", message: "Base64 images array is missing", details: nil))
+        
+        guard let base64Array = args[PluginKeys.base64Imgs] as? [String] else {
+            result(FlutterError(
+                code: PluginKeys.invalidImages,
+                message: PluginKeys.invalidArgumentsMessage,
+                details: nil))
             return
         }
-        
+
         let images: [UIImage] = base64Array.compactMap { str in
             if let data = Data(base64Encoded: str) {
                 return UIImage(data: data)
@@ -172,12 +208,16 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
         }
         
         var config: ValidationConfiguration? = nil
-        if let configDict = args["configuration"] as? [String: Any] {
+        
+        if let configDict = args[PluginKeys.configuration] as? [String: Any] {
             config = ValidationConfiguration.fromJson(json: configDict)
         }
-        
+
         guard let scanDocApi = scanDocApi else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "Scan Doc is not initialized", details: nil))
+            result(FlutterError(
+                code: PluginKeys.notInitialized,
+                message: PluginKeys.notInitializedMessage,
+                details: nil))
             return
         }
         
@@ -186,7 +226,7 @@ public class SwiftMonriPaymentsPlugin: NSObject, FlutterPlugin {
             case .success(let response):
                 result(response.toJson())
             case .failure(let error):
-                result(FlutterError(code: "VALIDATION_FAILED", message: error.localizedDescription, details: nil))
+                result(FlutterError(code: PluginKeys.validationFailed, message: error.localizedDescription, details: nil))
             }
         }
     }
