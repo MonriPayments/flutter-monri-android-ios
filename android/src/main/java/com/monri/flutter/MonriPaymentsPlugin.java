@@ -221,12 +221,12 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         sharedPreferences.edit().putString("com.monri.meta.library", library).apply();
     }
 
-    private Bitmap base64ToBitmap(String base64) {
+    private Bitmap base64ToBitmap(final String base64) {
         final byte[] decoded = android.util.Base64.decode(base64, android.util.Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
     }
 
-    private void initScanDoc(Object arguments, Result result) {
+    private void initScanDoc(final Object arguments, final Result result) {
         if (!(arguments instanceof Map)) {
             result.error(ERROR_INVALID_ARGS, MSG_ARGS_MUST_BE_MAP, null);
             return;
@@ -237,7 +237,7 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         result.success(null);
     }
 
-    private void extractScannedCard(Object arguments, Result result) {
+    private void extractScannedCard(final Object arguments, final Result result) {
 
         if (!(arguments instanceof Map)) {
             result.error(ERROR_INVALID_ARGS, MSG_ARGS_MUST_BE_MAP, null);
@@ -262,12 +262,12 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
         final ResultCallback<ExtractionResponse> callback = new ResultCallback<ExtractionResponse>() {
             @Override
-            public void onSuccess(ExtractionResponse response) {
+            public void onSuccess(final ExtractionResponse response) {
                 result.success(extractionResponseToJson(response));
             }
 
             @Override
-            public void onError(Throwable error) {
+            public void onError(final Throwable error) {
                 result.error(ERROR_EXTRACTION, error.getMessage(), null);
             }
         };
@@ -283,7 +283,7 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         }
     }
 
-    private void validateScannedCard(Object arguments, Result result) {
+    private void validateScannedCard(final Object arguments, final Result result) {
 
         if (!(arguments instanceof Map)) {
             result.error(ERROR_INVALID_ARGS, MSG_ARGS_MUST_BE_MAP, null);
@@ -318,12 +318,12 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
         scanDocApi.validateScannedCard(bitmaps, config, new ResultCallback<ValidationResponse>() {
             @Override
-            public void onSuccess(ValidationResponse response) {
+            public void onSuccess(final ValidationResponse response) {
                 result.success(validationResponseToJson(response));
             }
 
             @Override
-            public void onError(Throwable error) {
+            public void onError(final Throwable error) {
                 result.error(ERROR_VALIDATION, error.getMessage(), null);
             }
         });
