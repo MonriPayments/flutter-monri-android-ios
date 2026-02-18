@@ -3,11 +3,11 @@ PODS:
   - camera_avfoundation (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - Monri (2.3.1):
+  - Monri (2.3.2):
     - Alamofire (~> 5.10.2)
-  - MonriPayments (1.0.0):
+  - MonriPayments (1.3.0):
     - Flutter
-    - Monri (= 2.3.1)
+    - Monri (= 2.3.2)
   - permission_handler_apple (9.3.0):
     - Flutter
 
@@ -15,7 +15,7 @@ DEPENDENCIES:
   - Alamofire (~> 5.10.2)
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - Flutter (from `Flutter`)
-  - Monri (= 2.3.1)
+  - Monri (= 2.3.2)
   - MonriPayments (from `.symlinks/plugins/MonriPayments/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
 
@@ -38,10 +38,10 @@ SPEC CHECKSUMS:
   Alamofire: 7193b3b92c74a07f85569e1a6c4f4237291e7496
   camera_avfoundation: 5675ca25298b6f81fa0a325188e7df62cc217741
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  Monri: 382d11c8307355f40114ef9861df3a63db2724ef
-  MonriPayments: 6ed084dcb3357f65e372dfaca7c7d6eeed99b342
+  Monri: 22a19fd8f9b7104629bd50da9a43b70374aa4d3a
+  MonriPayments: 4b746fb4e0d0eafb0b86460df5202459b7a68fa3
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
 
-PODFILE CHECKSUM: 4f1f0dc3c316a7b6e09856bf91ed628bd54e4bf8
+PODFILE CHECKSUM: 68d1a21edfc399c119d57739a3e86f617e2ee305
 
 COCOAPODS: 1.16.2

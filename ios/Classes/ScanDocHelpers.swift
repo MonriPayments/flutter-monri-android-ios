@@ -49,8 +49,7 @@ extension ValidationConfiguration {
             blurValues: blurValues,
             validationSettings: ValidationConfigurationSettings(
                 skipImageSizeCheck: skipImageSizeCheck
-            ),
-            acceptTermsAndConditions: true
+            )
         )
     }
 }
