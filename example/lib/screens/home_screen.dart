@@ -6,12 +6,19 @@ import 'package:MonriPayments_example/models/object_argument.dart';
 import 'package:MonriPayments_example/widgets/monri_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../routes.dart';
 
 class Home extends StatelessWidget {
+
+  Future<void> _initCameraFlow() async {
+    await Permission.camera.request();
+  }
+
   @override
   Widget build(BuildContext context) {
+    _initCameraFlow();
 
     var platformPayment = Platform.isAndroid ? "Google Pay" : "Apple Pay";
 
@@ -76,6 +83,14 @@ class Home extends StatelessWidget {
                 Platform.isAndroid ? payWithGooglePay() : payWithApplePay();
               },
                   'Pay with $platformPayment'
+              ),
+              MonriButton(() {
+                Navigator.pushNamed(
+                    context, AvailableAppRoutes.PHOTO_CAPTURE,
+                    arguments: {}
+                );
+              },
+                  'Extract card details'
               ),
             ],
           ),

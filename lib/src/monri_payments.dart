@@ -4,6 +4,11 @@ import 'package:MonriPayments/src/gpay_button_theme.dart';
 import 'package:MonriPayments/src/gpay_button_type.dart';
 import 'package:MonriPayments/src/pk_payment_button_style.dart';
 import 'package:MonriPayments/src/pk_payment_button_type.dart';
+import 'package:MonriPayments/src/scandoc/scan_doc_api_options.dart';
+import 'package:MonriPayments/src/scandoc/scan_doc_extraction_configuration.dart';
+import 'package:MonriPayments/src/scandoc/scan_doc_extraction_response.dart';
+import 'package:MonriPayments/src/scandoc/scan_doc_validation_configuration.dart';
+import 'package:MonriPayments/src/scandoc/scan_doc_validation_response.dart';
 import 'package:MonriPayments/src/test/monri_payments_test.dart';
 import 'package:flutter/services.dart';
 
@@ -252,7 +257,6 @@ class _MonriPaymentsImpl extends MonriPayments {
       SavedCardConfirmPaymentParams arguments) async {
     Map result =
         await _channel.invokeMethod('confirmPayment', arguments.toJSON());
-    // print(result);
     return PaymentResponse.fromJson(result);
   }
 
@@ -261,7 +265,6 @@ class _MonriPaymentsImpl extends MonriPayments {
       ApplePayConfirmPaymentParams arguments) async {
     Map result =
         await _channel.invokeMethod('confirmApplePayment', arguments.toJSON());
-    // print(result);
     return PaymentResponse.fromJson(result);
   }
 
@@ -270,9 +273,54 @@ class _MonriPaymentsImpl extends MonriPayments {
       GooglePayConfirmPaymentParams arguments) async {
     Map result =
         await _channel.invokeMethod('confirmGooglePayment', arguments.toJSON());
-    // print(result);
     return PaymentResponse.fromJson(result);
   }
+
+  @override
+  Future<ScanDocExtractionResponse?> extractScannedCard(
+      String base64Image,
+      ScanDocExtractionConfiguration? configuration,
+      ) async {
+    final Map<dynamic, dynamic> result = await _channel.invokeMethod(
+      'extractScannedCard',
+      {
+        'base64Img': base64Image,
+        'configuration': configuration?.toJson(),
+      },
+    );
+
+    return ScanDocExtractionResponse.fromJson(
+      Map<String, dynamic>.from(result),
+    );
+  }
+
+
+  @override
+  Future<void> initScanDoc(ScanDocApiOptions apiOptions) async {
+    await _channel.invokeMethod(
+      'initScanDoc',
+      apiOptions.toJSON(),
+    );
+  }
+
+  @override
+  Future<ScanDocValidationResponse?> validateScannedCard(
+      List<String> base64Images,
+      ScanDocValidationConfiguration? configuration,
+      ) async {
+    final Map<dynamic, dynamic> result = await _channel.invokeMethod(
+      'validateScannedCard',
+      {
+        'base64Imgs': base64Images,
+        'configuration': configuration?.toJson(),
+      },
+    );
+
+    return ScanDocValidationResponse.fromJson(
+      Map<String, dynamic>.from(result),
+    );
+  }
+
 }
 
 abstract class MonriPayments {
@@ -290,4 +338,10 @@ abstract class MonriPayments {
 
   Future<PaymentResponse> confirmGooglePayPayment(
       GooglePayConfirmPaymentParams params);
+
+  Future<void> initScanDoc(ScanDocApiOptions apiOptions);
+
+  Future<ScanDocValidationResponse?> validateScannedCard(List<String> base64Images, ScanDocValidationConfiguration? configuration);
+
+  Future<ScanDocExtractionResponse?> extractScannedCard(String base64Image, ScanDocExtractionConfiguration? configuration);
 }
