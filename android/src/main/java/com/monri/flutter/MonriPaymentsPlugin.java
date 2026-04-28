@@ -69,12 +69,14 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     private static final String ERROR_INVALID_IMAGES = "INVALID_IMAGES";
     private static final String ERROR_EXTRACTION = "EXTRACTION_ERROR";
     private static final String ERROR_VALIDATION = "VALIDATION_ERROR";
+    private static final String ERROR_MONRI_UNAVAILABLE = "MONRI_UNAVAILABLE";
 
     // Error messages
     private static final String MSG_ARGS_MUST_BE_MAP = "Arguments must be a map";
     private static final String MSG_MISSING_BASE64_IMG = "Missing base64Img";
     private static final String MSG_MISSING_BASE64_IMGS = "Missing base64Imgs";
     private static final String MSG_FAILED_DECODE_BITMAP = "Failed to decode base64 to bitmap";
+    private static final String MSG_MONRI_UNAVAILABLE = "Monri SDK is not initialized yet. Please retry payment.";
 
     private MethodChannel channel;
     private Boolean devMode = true;
@@ -90,6 +92,20 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
         if (activity != null && monri == null) {
             monri = new Monri((ActivityResultCaller) this.activity);
         }
+    }
+
+    private Monri ensureMonriOrReport(MethodChannel.Result result) {
+        if (monri != null) {
+            return monri;
+        }
+
+        initMonri();
+        if (monri != null) {
+            return monri;
+        }
+
+        result.error(ERROR_MONRI_UNAVAILABLE, MSG_MONRI_UNAVAILABLE, null);
+        return null;
     }
 
     @Override
@@ -110,15 +126,19 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
 
     private void monriConfirmPayment(final Object arguments, final MethodChannel.Result result) {
+        final Monri monriInstance = ensureMonriOrReport(result);
+        if (monriInstance == null) {
+            return;
+        }
 
         final FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
         final ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
 
         MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
 
-        monri.setMonriApiOptions(flutterConfirmPaymentParams.monriApiOptions());
+        monriInstance.setMonriApiOptions(flutterConfirmPaymentParams.monriApiOptions());
 
-        this.monri.confirmPayment(confirmPaymentParams, (paymentResult, throwable) -> {
+        monriInstance.confirmPayment(confirmPaymentParams, (paymentResult, throwable) -> {
             if (throwable != null) {
                 result.error("payment_error", throwable.getMessage(), null);
                 return;
@@ -131,19 +151,23 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
 
     private void confirmGooglePayPayment(Object arguments, MethodChannel.Result result) {
+        final Monri monriInstance = ensureMonriOrReport(result);
+        if (monriInstance == null) {
+            return;
+        }
 
         final FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
         final ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
 
         MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
 
-        monri.setMonriApiOptions(flutterConfirmPaymentParams.monriApiOptions());
+        monriInstance.setMonriApiOptions(flutterConfirmPaymentParams.monriApiOptions());
 
         final FlutterConfirmPaymentParams.FlutterGooglePay gPayParams = flutterConfirmPaymentParams.getGooglePayData();
 
         final GooglePayButtonOptions googlePayButtonOptions = new GooglePayButtonOptions(gPayParams.gPayButtonType, gPayParams.gPayTheme, gPayParams.gPayCornerRadius);
 
-        this.monri.confirmPayment(confirmPaymentParams, (paymentResult, throwable) -> {
+        monriInstance.confirmPayment(confirmPaymentParams, (paymentResult, throwable) -> {
             if (throwable != null) {
                 result.error("payment_error", throwable.getMessage(), null);
                 return;
@@ -217,6 +241,9 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
 
     private static void writeMetaData(Context context, String library) {
+        if (context == null) {
+            return;
+        }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         sharedPreferences.edit().putString("com.monri.meta.library", library).apply();
     }
