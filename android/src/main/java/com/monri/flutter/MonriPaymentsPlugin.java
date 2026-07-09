@@ -112,7 +112,7 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     private void monriConfirmPayment(final Object arguments, final MethodChannel.Result result) {
 
         final FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
-        final ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
+        final ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams(this.activity.getApplicationContext());
 
         MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
 
@@ -133,7 +133,7 @@ public class MonriPaymentsPlugin implements FlutterPlugin, MethodCallHandler, Ac
     private void confirmGooglePayPayment(Object arguments, MethodChannel.Result result) {
 
         final FlutterConfirmPaymentParams flutterConfirmPaymentParams = new MonriConverter(arguments).process();
-        final ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams();
+        final ConfirmPaymentParams confirmPaymentParams = flutterConfirmPaymentParams.confirmPaymentParams(this.activity.getApplicationContext());
 
         MonriPaymentsPlugin.writeMetaData(this.activity, String.format("Android-SDK:Flutter:%s", BuildConfig.MONRI_FLUTTER_PLUGIN_VERSION));
 
