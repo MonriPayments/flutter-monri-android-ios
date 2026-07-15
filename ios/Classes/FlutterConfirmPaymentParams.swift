@@ -83,7 +83,10 @@ class FlutterConfirmPaymentParams {
     }
     
     func confirmPaymentParams() -> ConfirmPaymentParams {
-        return ConfirmPaymentParams(paymentId: clientSecret, paymentMethod: paymentMethodParams(), transaction: buildMonriTransactionParams())
+        return ConfirmPaymentParams(paymentId: clientSecret,
+                                    paymentMethod: paymentMethodParams(),
+                                    transaction: buildMonriTransactionParams(),
+                                    browserInfo: BrowserInfo.create())
     }
     
     static func create(request: Dictionary<String, AnyObject?>, card: FlutterCard?, savedCard: FlutterSavedCard?) -> FlutterConfirmPaymentParams {

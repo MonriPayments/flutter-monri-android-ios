@@ -1,5 +1,8 @@
 package com.monri.flutter;
 
+import android.content.Context;
+
+import com.monri.android.model.BrowserInfo;
 import com.monri.android.model.Card;
 import com.monri.android.model.ConfirmPaymentParams;
 import com.monri.android.model.CustomerParams;
@@ -69,8 +72,9 @@ public class FlutterConfirmPaymentParams {
         return rv;
     }
 
-    ConfirmPaymentParams confirmPaymentParams() {
-        return ConfirmPaymentParams.create(clientSecret, paymentMethodParams(), transactionParams());
+    ConfirmPaymentParams confirmPaymentParams(final Context context) {
+        return ConfirmPaymentParams.create(clientSecret, paymentMethodParams(), transactionParams())
+                                   .setBrowserInfo(BrowserInfo.create(context));
     }
 
     MonriApiOptions monriApiOptions() {
