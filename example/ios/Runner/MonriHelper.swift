@@ -36,7 +36,6 @@ import CommonCrypto
         let digestInput = "\(key)\(timestamp)\(authenticityToken)\(bodyAsString)"
         let digest = digestInput.sha512()
 
-        print("SHA512" + "da".sha512())
         
         // Create authorization header
         let authorization = "WP3-v2 \(authenticityToken) \(timestamp) \(digest)"
@@ -48,12 +47,22 @@ import CommonCrypto
         ]
         
         // Make request
-        AF.request("https://ipgtest.monri.com/v2/payment/new",
-                        method: .post,
-                        parameters: parameters,
-                        encoding: JSONEncoding.default,
-                        headers: headers)
-                .responseJSON { dataResponse in
+        guard let requestUrl = URL(string: "https://ipgtest.monri.com/v2/payment/new") else {
+            callback(nil)
+            return
+        }
+
+        // Send the exact bytes that were hashed; re-encoding the parameters
+        // produces a different body and breaks the digest.
+        var request = URLRequest(url: requestUrl)
+        request.httpMethod = HTTPMethod.post.rawValue
+        request.httpBody = jsonData
+        for (name, value) in headers.dictionary {
+            request.setValue(value, forHTTPHeaderField: name)
+        }
+
+        AF.request(request)
+                .responseData { dataResponse in
                     guard let data = dataResponse.data else {
                         print("No data received")
                         callback(nil)
@@ -92,7 +101,11 @@ public class NewPaymentResponse {
     }
 
     public static func fromJson(_ json: Dictionary<String, Any>) -> NewPaymentResponse? {
-        return NewPaymentResponse(clientSecret: json["client_secret"] as! String, status: json["status"] as! String)
+        guard let clientSecret = json["client_secret"] as? String,
+              let status = json["status"] as? String else {
+            return nil
+        }
+        return NewPaymentResponse(clientSecret: clientSecret, status: status)
     }
 }
 
